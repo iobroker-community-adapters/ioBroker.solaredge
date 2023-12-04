@@ -25,7 +25,7 @@
 For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 -->
 
-## Solaredge Adapter for ioBroker
+## Solaredge Adapter for ioBroker 
 
 Get data from solaredge monitoring portal.
 Currently, only the /overview data point is used to get the current power and day/month/year/lifetime energy readings.
