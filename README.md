@@ -1,16 +1,29 @@
 ![Logo](admin/solaredge.png)
 # ioBroker.solaredge
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.solaredge.svg)](https://www.npmjs.com/package/iobroker.solaredge)
+[![GitHub license](https://img.shields.io/github/license/iobroker-community-adapters/ioBroker.solaredge)](https://github.com/iobroker-community-adapters/ioBroker.solaredge/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.solaredge.svg)](https://www.npmjs.com/package/iobroker.solaredge)
-![Number of Installations (latest)](http://iobroker.live/badges/solaredge-installed.svg)
-![Number of Installations (stable)](http://iobroker.live/badges/solaredge-stable.svg)
-[![Dependency Status](https://img.shields.io/david/92lleo/iobroker.solaredge.svg)](https://david-dm.org/92lleo/iobroker.solaredge)
-[![Known Vulnerabilities](https://snyk.io/test/github/92lleo/ioBroker.solaredge/badge.svg)](https://snyk.io/test/github/92lleo/ioBroker.solaredge)
+![GitHub repo size](https://img.shields.io/github/repo-size/iobroker-community-adapters/ioBroker.solaredge)
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/solaredge/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)</br>
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/iobroker-community-adapters/ioBroker.solaredge)
+![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/iobroker-community-adapters/ioBroker.solaredge/latest)
+![GitHub last commit](https://img.shields.io/github/last-commit/iobroker-community-adapters/ioBroker.solaredge)
+![GitHub issues](https://img.shields.io/github/issues/iobroker-community-adapters/ioBroker.solaredge)
+</br>
+**Version:** </br>
+[![NPM version](http://img.shields.io/npm/v/iobroker.solaredge.svg)](https://www.npmjs.com/package/iobroker.solaredge)
+![Current version in stable repository](https://iobroker.live/badges/solaredge-stable.svg)
+![Number of Installations](https://iobroker.live/badges/solaredge-installed.svg)
+</br>
+**Tests:** </br>
+[![Test and Release](https://github.com/iobroker-community-adapters/ioBroker.solaredge/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.solaredge/actions/workflows/test-and-release.yml)
+[![CodeQL](https://github.com/iobroker-community-adapters/ioBroker.solaredge/actions/workflows/codeql.yml/badge.svg)](https://github.com/iobroker-community-adapters/ioBroker.solaredge/actions/workflows/codeql.yml)
 
-[![NPM](https://nodei.co/npm/iobroker.solaredge.png?downloads=true)](https://nodei.co/npm/iobroker.solaredge/)
-
-**Tests:**: [![Travis-CI](http://img.shields.io/travis/92lleo/ioBroker.solaredge/master.svg)](https://travis-ci.org/92lleo/ioBroker.solaredge)
+<!--
+## Sentry
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.**
+For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+-->
 
 ## solaredge adapter for ioBroker
 
@@ -23,14 +36,20 @@ You need your site id and api key to use this adapter. To get these, go to https
 - site id: log in, site id is the "ID" on the right, e.g., 12345.  
 - api key: log in, go to the admin settings and enable api access there. If you don't see admin settings, send mail to solaredge to enable admin for your account.
 
-Roadmap:
-* Add power and energy details
-* Add other devices than inverters
+
+## Credits
+
+This adapter would not have been possible without the great work of @92lleo (https://github.com/92lleo), who wrote the code for the initial versions and released it to ioborker-community-adapters.
 
 <!--
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+
+### **WORK IN PROGRESS**
+* (mcm1957) Adapter has been moved to iobroker-community-adapters organization
+* (mcm1957) Dependencies have been updated
+
 ### 1.1.0 (2023-11-16)
 * (bluefox) Added the current power flow data
 
@@ -61,6 +80,7 @@ Roadmap:
 ## License
 MIT License
 
+Copyright (c) 2023 iobroker-community-adapters <mcm57@gmx.at>
 Copyright (c) 2019-2023 Leonhard Kuenzler <leonhard@kuenzler.io>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
