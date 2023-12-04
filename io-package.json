@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "solaredge",
-    "version": "1.2.0-alpha.0",
+    "version": "1.2.0-alpha.1",
     "news": {
+      "1.2.0-alpha.1": {
+        "en": "Adapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
+        "de": "Adapter wurde auf iobroker-community-adapters Organisation verschoben\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер переехал в организацию iobroker-community-adapters\nВ зависимости были обновлены",
+        "pt": "Adapter foi movido para iobroker-community-adapters organização\nAs dependências foram atualizadas",
+        "nl": "Adapter is verplaatst naar iobroker-community-papters organisatie\nAfhankelijkheid",
+        "fr": "L'adaptateur a été déplacé à l'organisation iobroker-community-adapters\nLes dépendances ont été mises à jour",
+        "it": "L'adattatore è stato spostato nell'organizzazione di iobroker-community-adapters\nLe dipendenze sono state aggiornate",
+        "es": "Adaptador ha sido trasladado a la organización de ibroker-community-adapters\nSe han actualizado las dependencias",
+        "pl": "Adapter został przeniesiony do organizacji iobroker-kommunity-profit\nZależności zostały zaktualizowane",
+        "uk": "Переміщено перехід на організацію iobroker-community-adapters\nОновлено залежність",
+        "zh-cn": "已经向加勒比采掘公司-社区组织道歉。\n已更新了属地"
+      },
       "1.2.0-alpha.0": {
         "en": "Adapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
         "de": "Adapter wurde auf iobroker-community-adapters Organisation verschoben\nAbhängigkeiten wurden aktualisiert",
