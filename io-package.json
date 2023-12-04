@@ -28,34 +28,8 @@
         "pl": "Zastąpiła konfigura JSON i zastąpiona została modułem axios",
         "uk": "Додано налаштування JSON і заміну потрібно модуль з axios",
         "zh-cn": "增加联合联络中心,并更换了连接点的单元。"
-      },
-      "0.3.0": {
-        "en": "Address review feedback from adapter review (see #19)"
-      },
-      "0.2.0": {
-        "en": "Fix updating already created states and internal polishing"
-      },
-      "0.1.1": {
-        "en": "fix \"object data is invalid\" issue, now works with new js-controller"
-      },
-      "0.1.0": {
-        "en": "First beta release",
-        "de": "Erste Beta"
-      },
-      "0.0.1": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Начальная версия",
-        "pt": "lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "首次出版"
       }
     },
-    "title": "Solaredge Monitoring",
     "titleLang": {
       "en": "Solaredge Monitoring",
       "de": "Solaredge-Überwachung",
@@ -66,6 +40,7 @@
       "it": "Monitoraggio di Solaredge",
       "es": "Monitoreo Solaredge",
       "pl": "Monitorowanie Solaredge",
+      "uk": "Сонячний моніторинг",
       "zh-cn": "Solaredge监控"
     },
     "desc": {
@@ -78,10 +53,12 @@
       "it": "Ottieni dati dal portale di monitoraggio di Solaredge",
       "es": "Obtenga datos del portal de monitoreo de solaredge",
       "pl": "Uzyskaj dane z portalu monitorowania Solaredge",
+      "uk": "Отримати дані з порталу сонячних батарей",
       "zh-cn": "从solaredge监控门户获取数据"
     },
     "authors": [
-      "92lleo <leonhard@kuenzler.io>"
+      "92lleo <leonhard@kuenzler.io>",
+      "iobroker-community-adapters <mcm57@gmx.at>"
     ],
     "keywords": [
       "solaredge",
@@ -95,23 +72,28 @@
     "main": "main.js",
     "icon": "solaredge.png",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/92lleo/ioBroker.solaredge/master/admin/solaredge.png",
-    "readme": "https://github.com/92lleo/ioBroker.solaredge/blob/master/README.md",
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.solaredge/master/admin/solaredge.png",
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.solaredge/blob/master/README.md",
     "loglevel": "info",
     "mode": "schedule",
     "schedule": "*/15 * * * *",
     "type": "energy",
     "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
     "adminUI": {
       "config": "json"
     },
     "dependencies": [
       {
-        "js-controller": ">=3.0.0"
+        "js-controller": ">=4.0.24"
       }
     ],
-    "connectionType": "cloud",
-    "dataSource": "poll"
+    "globalDependencies": [
+        {
+          "admin": ">=5.1.13"
+        }
+      ]
   },
   "native": {
     "siteid": "",
