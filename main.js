@@ -74,7 +74,7 @@ async function main() {
 
     // adapter only works with siteid and api key set
     if (!siteid || !apikey) {
-        adapter.log.error('siteid or api key not set')
+        adapter.log.error('siteid or api key not set');
     } else {
         // possible resources: overview, details, list
         // for some other resources, the url itself might change
@@ -217,7 +217,7 @@ async function main() {
             adapter.log.debug('Done, stopping...');
             adapter.stop();
         } catch (error) {
-            adapter.log.error(`Cannot read data from solaredge cloud: ${error.response && error.response.data ? 
+            adapter.log.error(`Cannot read data from solaredge cloud: ${error.response && error.response.data ?
                 JSON.stringify(error.response.data) : (error.response && error.response.status ? error.response.status : error)}`);
         }
     }
