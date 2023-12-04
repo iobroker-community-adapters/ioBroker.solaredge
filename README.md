@@ -45,7 +45,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.2.0-alpha.0 (2023-12-04)
+### **WORK IN PROGRESS**
 * (mcm1957) Adapter has been moved to iobroker-community-adapters organization
 * (mcm1957) Dependencies have been updated
 
