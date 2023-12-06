@@ -83,6 +83,7 @@ async function main() {
         await checkStatesCreationNeeded();
 
         try {
+            axios.defaults.timeout = 15*1000; // response timeout
             const response = await axios(url);
             if (response.data) {
                 const overview = response.data.overview;
