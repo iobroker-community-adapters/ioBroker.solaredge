@@ -212,14 +212,12 @@ async function main() {
                     }
                 }
             }
-
-
-            adapter.log.debug('Done, stopping...');
-            adapter.stop();
         } catch (error) {
             adapter.log.error(`Cannot read data from solaredge cloud: ${error.response && error.response.data ?
                 JSON.stringify(error.response.data) : (error.response && error.response.status ? error.response.status : error)}`);
         }
+        adapter.log.debug('Done, stopping...');
+        adapter.stop();
     }
 }
 
