@@ -1,33 +1,20 @@
 {
   "common": {
     "name": "solaredge",
-    "version": "1.2.0-alpha.1",
+    "version": "1.2.0",
     "news": {
-      "1.2.0-alpha.1": {
-        "en": "Adapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
-        "de": "Adapter wurde auf iobroker-community-adapters Organisation verschoben\nAbhängigkeiten wurden aktualisiert",
-        "ru": "Адаптер переехал в организацию iobroker-community-adapters\nВ зависимости были обновлены",
-        "pt": "Adapter foi movido para iobroker-community-adapters organização\nAs dependências foram atualizadas",
-        "nl": "Adapter is verplaatst naar iobroker-community-papters organisatie\nAfhankelijkheid",
-        "fr": "L'adaptateur a été déplacé à l'organisation iobroker-community-adapters\nLes dépendances ont été mises à jour",
-        "it": "L'adattatore è stato spostato nell'organizzazione di iobroker-community-adapters\nLe dipendenze sono state aggiornate",
-        "es": "Adaptador ha sido trasladado a la organización de ibroker-community-adapters\nSe han actualizado las dependencias",
-        "pl": "Adapter został przeniesiony do organizacji iobroker-kommunity-profit\nZależności zostały zaktualizowane",
-        "uk": "Переміщено перехід на організацію iobroker-community-adapters\nОновлено залежність",
-        "zh-cn": "已经向加勒比采掘公司-社区组织道歉。\n已更新了属地"
-      },
-      "1.2.0-alpha.0": {
-        "en": "Adapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
-        "de": "Adapter wurde auf iobroker-community-adapters Organisation verschoben\nAbhängigkeiten wurden aktualisiert",
-        "ru": "Адаптер переехал в организацию iobroker-community-adapters\nВ зависимости были обновлены",
-        "pt": "Adapter foi movido para iobroker-community-adapters organização\nAs dependências foram atualizadas",
-        "nl": "Adapter is verplaatst naar iobroker-community-papters organisatie\nAfhankelijkheid",
-        "fr": "L'adaptateur a été déplacé à l'organisation iobroker-community-adapters\nLes dépendances ont été mises à jour",
-        "it": "L'adattatore è stato spostato nell'organizzazione di iobroker-community-adapters\nLe dipendenze sono state aggiornate",
-        "es": "Adaptador ha sido trasladado a la organización de ibroker-community-adapters\nSe han actualizado las dependencias",
-        "pl": "Adapter został przeniesiony do organizacji iobroker-kommunity-profit\nZależności zostały zaktualizowane",
-        "uk": "Переміщено перехід на організацію iobroker-community-adapters\nОновлено залежність",
-        "zh-cn": "已经向加勒比采掘公司-社区组织道歉。\n已更新了属地"
+      "1.2.0": {
+        "en": "Adapter did not terminate in case of an exception. This has been fixed.\nA response timeout has been added to network calls.\nAdapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
+        "de": "Adapter bendete sich nicht im Falle einer Ausnahme. Das wurde behoben.\nZu Netzwerkaufrufen wurde ein Antwortzeitout hinzugefügt.\nAdapter wurde auf iobroker-community-Adapter organisation verschoben\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер не прекращен в случае исключения. Это было исправлено.\nРасписание ответа было добавлено в сетевые звонки.\nАдаптер переехал в организацию iobroker-community-adapters\nВ зависимости были обновлены",
+        "pt": "O adaptador não terminou em caso de exceção. Isto foi corrigido.\nUm timeout de resposta foi adicionado às chamadas de rede.\nAdapter foi movido para iobroker-community-adapters organização\nAs dependências foram atualizadas",
+        "nl": "Adapter beëindigde niet in geval van een uitzondering. Dit is opgelost.\nEen reactietijd is toegevoegd aan netwerkbelletjes.\nAdapter is verplaatst naar iobroker-community-papters organisatie\nAfhankelijkheid",
+        "fr": "L'adaptateur n'a pas pris fin en cas d'exception. Ça a été réparé.\nUn délai de réponse a été ajouté aux appels réseau.\nL'adaptateur a été déplacé à l'organisation iobroker-community-adapters\nLes dépendances ont été mises à jour",
+        "it": "L'adattatore non ha terminato in caso di eccezione. E' stato risolto.\nUn timeout di risposta è stato aggiunto alle chiamate di rete.\nL'adattatore è stato spostato nell'organizzazione di iobroker-community-adapters\nLe dipendenze sono state aggiornate",
+        "es": "El adaptador no terminó en caso de excepción. Esto ha sido arreglado.\nSe ha añadido un tiempo de respuesta a llamadas de red.\nAdaptador ha sido trasladado a la organización de ibroker-community-adapters\nSe han actualizado las dependencias",
+        "pl": "Adapter nie zakończył się wyjątkiem. Zostało to ustalone.\nCzas reakcji został dodany do połączeń sieciowych.\nAdapter został przeniesiony do organizacji iobroker-kommunity-profit\nZależności zostały zaktualizowane",
+        "uk": "Перехідник не розірвав у разі виключення. Це було виправлено.\nДо мережевих дзвінків додано час відповідей.\nПереміщено перехід на організацію iobroker-community-adapters\nОновлено залежність",
+        "zh-cn": "在例外情况下,不终止制裁。 这已经确定。.\n在网络呼吁中增加了答复时间。.\n已经向加勒比采掘公司-社区组织道歉。\n已更新了属地"
       },
       "1.1.0": {
         "en": "Added the current power flow data",

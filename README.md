@@ -45,7 +45,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.2.0 (2023-12-06)
 * (mcm1957) Adapter did not terminate in case of an exception. This has been fixed.
 * (mcm1957) A response timeout has been added to network calls.
 * (mcm1957) Adapter has been moved to iobroker-community-adapters organization
