@@ -45,7 +45,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.2.1 (2023-12-14)
 * (bluefox) Updated packages
 * (bluefox) Allowed adapter execution by restart
 

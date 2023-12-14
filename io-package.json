@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "solaredge",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "news": {
+      "1.2.1": {
+        "en": "Updated packages\nAllowed adapter execution by restart",
+        "de": "Aktualisierte Pakete\nErlaubte Adapterausführung durch Neustart",
+        "ru": "Обновленные пакеты\nРазрешено исполнение адаптера по перезагрузке",
+        "pt": "Pacotes atualizados\nExecução do adaptador permitido pelo reinício",
+        "nl": "Verouderde pakketten\nVertaling:",
+        "fr": "Forfaits mis à jour\nExécution de l'adaptateur autorisé par redémarrage",
+        "it": "Pacchetti aggiornati\nEsecuzione adattatore consentita da riavvio",
+        "es": "Paquetes actualizados\nEjecución de adaptador permitido por reinicio",
+        "pl": "Pakiet upoważniony\nAplikacja adaptatora poprzez restart",
+        "uk": "Оновлені пакети\nДозволяється виконання адаптера за допомогою перезавантаження",
+        "zh-cn": "最新一揽子计划\n允许重新启动的适应执行"
+      },
       "1.2.0": {
         "en": "Adapter did not terminate in case of an exception. This has been fixed.\nA response timeout has been added to network calls.\nAdapter has been moved to iobroker-community-adapters organization\nDependencies have been updated",
         "de": "Adapter bendete sich nicht im Falle einer Ausnahme. Das wurde behoben.\nZu Netzwerkaufrufen wurde ein Antwortzeitout hinzugefügt.\nAdapter wurde auf iobroker-community-Adapter organisation verschoben\nAbhängigkeiten wurden aktualisiert",
