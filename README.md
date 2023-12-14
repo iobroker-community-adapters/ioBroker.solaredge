@@ -45,6 +45,10 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Updated packages
+* (bluefox) Allowed adapter execution by restart
+
 ### 1.2.0 (2023-12-06)
 * (mcm1957) Adapter did not terminate in case of an exception. This has been fixed.
 * (mcm1957) A response timeout has been added to network calls.

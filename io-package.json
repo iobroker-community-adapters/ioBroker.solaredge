@@ -94,6 +94,7 @@
     "compact": true,
     "connectionType": "cloud",
     "dataSource": "poll",
+    "allowInit": true,
     "adminUI": {
       "config": "json"
     },
@@ -106,7 +107,8 @@
       {
         "admin": ">=5.1.13"
       }
-    ]
+    ],
+    "tier": 3
   },
   "native": {
     "siteid": "",
