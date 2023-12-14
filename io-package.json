@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "solaredge",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "news": {
+      "1.2.2": {
+        "en": "Added random seconds to the schedule\nUpdated packages\nAllowed adapter execution by restart",
+        "de": "Zufällige Sekunden zum Zeitplan hinzugefügt\nAktualisierte Pakete\nErlaubte Adapterausführung durch Neustart",
+        "ru": "Добавлены случайные секунды к расписанию\nОбновленные пакеты\nРазрешено исполнение адаптера по перезагрузке",
+        "pt": "Adicionados segundos aleatórios para o cronograma\nPacotes atualizados\nExecução do adaptador permitido pelo reinício",
+        "nl": "Vertaling:\nVerouderde pakketten\nVertaling:",
+        "fr": "Ajout de secondes aléatoires à l'horaire\nForfaits mis à jour\nExécution de l'adaptateur autorisé par redémarrage",
+        "it": "Aggiunto secondi casuali al programma\nPacchetti aggiornati\nEsecuzione adattatore consentita da riavvio",
+        "es": "Añadido segundos aleatorios al programa\nPaquetes actualizados\nEjecución de adaptador permitido por reinicio",
+        "pl": "Dodawane losowe sekundy do harmonogramu\nPakiet upoważniony\nAplikacja adaptatora poprzez restart",
+        "uk": "Додано випадкові секунди в розклад\nОновлені пакети\nДозволяється виконання адаптера за допомогою перезавантаження",
+        "zh-cn": "表二\n最新一揽子计划\n允许重新启动的适应执行"
+      },
       "1.2.1": {
         "en": "Updated packages\nAllowed adapter execution by restart",
         "de": "Aktualisierte Pakete\nErlaubte Adapterausführung durch Neustart",
