@@ -45,7 +45,8 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.2.1 (2023-12-14)
+### **WORK IN PROGRESS**
+* (bluefox) Added random seconds to the schedule
 * (bluefox) Updated packages
 * (bluefox) Allowed adapter execution by restart
 

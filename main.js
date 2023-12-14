@@ -218,6 +218,19 @@ async function main() {
                 JSON.stringify(error.response.data) : (error.response && error.response.status ? error.response.status : error)}`);
         }
         adapter.log.debug('Done, stopping...');
+
+        // Change the schedule to a random seconds to spread the calls over the minute
+        try {
+            const instObj = await adapter.getForeignObjectAsync(`system.adapter.${adapter.namespace}`);
+            if (instObj && instObj.common && instObj.common.schedule && instObj.common.schedule === '*/15 * * * *') {
+                instObj.common.schedule = `${Math.floor(Math.random() * 60)} */15 * * * *`;
+                adapter.log.info(`Default schedule found and adjusted to spread calls better over the minute`);
+                await adapter.setForeignObjectAsync(`system.adapter.${adapter.namespace}`, instObj);
+            }
+        } catch (err) {
+            this.log.error(`Could not check or adjust the schedule: ${err.message}`);
+        }
+
         adapter.stop();
     }
 }
