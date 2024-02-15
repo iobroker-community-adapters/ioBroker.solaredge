@@ -45,7 +45,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.3.0 (2024-02-15)
 * (mcm1957) BREAKING: adapter requires node.js 18 or newer now.
 * (mcm1957) Adapter translations have been linked to weblate.
 * (mcm1957) Dependencies have been updated.
