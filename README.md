@@ -46,8 +46,9 @@ This adapter would not have been possible without the great work of @92lleo (htt
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
-* (mcm1957) BREAKING: adapter requires node.js 18 or newer now
-* (mcm1957) Dependencies have been updated
+* (mcm1957) BREAKING: adapter requires node.js 18 or newer now.
+* (mcm1957) Adapter translations have been linked to weblate.
+* (mcm1957) Dependencies have been updated.
 
 ### 1.2.2 (2023-12-14)
 * (bluefox) Added random seconds to the schedule
