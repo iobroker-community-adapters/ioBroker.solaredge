@@ -45,7 +45,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.4.0 (2024-04-28)
+### **WORK IN PROGRESS**
 * (mcm1957) Adapter requires node.js >= 18 and js-controller >= 5 now
 * (mcm1957) Dependencies have been updated
 
