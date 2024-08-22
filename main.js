@@ -202,7 +202,7 @@ async function main() {
                             role: 'value.storage.produced',
                             desc: 'Current production from storage'
                         });
-                        await adapter.createStateAsync('', siteid, 'currentStoragePower', {
+                        await adapter.createStateAsync('', siteid, 'currentStorageChargeLevel', {
                             name: 'Current charge level: Storage',
                             type: 'number',
                             read: true,
