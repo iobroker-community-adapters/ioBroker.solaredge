@@ -181,6 +181,40 @@ async function main() {
                             role: 'value.power.produced',
                             desc: 'Current production from PV'
                         });
+                        await adapter.createStateAsync('', siteid, 'currentStorageStatus', {
+                            name: 'Current status: Storage',
+                            type: 'string',
+                            read: true,
+                            write: false,
+                            role: 'value.storage.status',
+                            desc: 'Current status of the storage'
+                        });
+                        await adapter.createStateAsync('', siteid, 'currentStoragePower', {
+                            name: 'Current flow: Storage',
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            unit: 'kW',
+                            role: 'value.storage.produced',
+                            desc: 'Current production from storage'
+                        });
+                        await adapter.createStateAsync('', siteid, 'currentStoragePower', {
+                            name: 'Current charge level: Storage',
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            unit: '%',
+                            role: 'value.storage.charge-level',
+                            desc: 'Current production from storage'
+                        });
+                        await adapter.createStateAsync('', siteid, 'currentStorageCritical', {
+                            name: 'Current criticality: Storage',
+                            type: 'boolean',
+                            read: true,
+                            write: false,
+                            role: 'value.storage.critical',
+                            desc: 'Current criticality of storage'
+                        });
                     }
 
                     createStates = false;
@@ -210,6 +244,10 @@ async function main() {
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowGrid`, powerFlow.GRID ? powerFlow.GRID.currentPower : 0, true);
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowLoad`, powerFlow.LOAD ? powerFlow.LOAD.currentPower : 0, true);
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowPv`, powerFlow.PV ? powerFlow.PV.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.currentStorageStatus`, powerFlow.STORAGE ? powerFlow.STORAGE.status : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.currentStoragePower`, powerFlow.STORAGE ? powerFlow.STORAGE.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.currentStorageChargeLevel`, powerFlow.STORAGE ? powerFlow.STORAGE.chargeLevel : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.currentStorageCritical`, powerFlow.STORAGE ? powerFlow.STORAGE.critical : 0, true);
                     }
                 }
             }
