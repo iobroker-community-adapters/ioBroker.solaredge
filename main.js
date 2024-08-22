@@ -62,6 +62,10 @@ async function checkStatesCreationNeeded(){
         await checkStateCreationNeeded('currentFlowGrid');
         await checkStateCreationNeeded('currentFlowLoad');
         await checkStateCreationNeeded('currentFlowPv');
+        await checkStateCreationNeeded('currentStorageStatus');
+        await checkStateCreationNeeded('currentStoragePower');
+        await checkStateCreationNeeded('currentStorageChargeLevel');
+        await checkStateCreationNeeded('currentStorageCritical');
     }
 }
 
