@@ -62,13 +62,13 @@ async function checkStatesCreationNeeded(){
         await checkStateCreationNeeded('currentFlowGrid');
         await checkStateCreationNeeded('currentFlowLoad');
         await checkStateCreationNeeded('currentFlowPv');
-        await checkStateCreationNeeded('powerUnit'); // W or kW // siteCurrentPowerFlow.unit
+        await checkStateCreationNeeded('powerUnit'); // W or kW 
         await checkStateCreationNeeded('feedToBattery'); // true: battery charging
-        await checkStateCreationNeeded('batteryStatus'); // must not be 'Discharging' for heating up water // siteCurrentPowerFlow.STORAGE.status
+        await checkStateCreationNeeded('batteryStatus'); 
         await checkStateCreationNeeded('batteryPowerFlow'); // power from/to battery
-        await checkStateCreationNeeded('batteryChargeLevel'); // must be > 80 (%) for heating up water // siteCurrentPowerFlow.STORAGE.chargeLevel
-        await checkStateCreationNeeded('feedToGrid'); // must be 'true' for heating up water // array: siteCurrentPowerFlow.connections --> from:LOAD to:Grid
-        await checkStateCreationNeeded('gridPowerFlow'); // must be > 0.1 kW while feedToGrid= true. Otherwise, there is not enough energy available for heating up water // siteCurrentPowerFlow.GRID.currentPower
+        await checkStateCreationNeeded('batteryChargeLevel'); 
+        await checkStateCreationNeeded('feedToGrid'); 
+        await checkStateCreationNeeded('gridPowerFlow'); 
         await checkStateCreationNeeded('housePowerFlow');
         await checkStateCreationNeeded('pvPowerFlow'); // power from pv
         await checkStateCreationNeeded('pvStatus'); // active, idle, disabled
