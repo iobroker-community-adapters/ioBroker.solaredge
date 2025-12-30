@@ -2,21 +2,11 @@
   "name": "iobroker.solaredge",
   "version": "1.4.1",
   "description": "Get data from solaredge monitoring portal",
-  "author": {
-    "name": "92lleo",
-    "email": "leonhard@kuenzler.io"
-  },
+  "author": "92lleo <leonhard@kuenzler.io>",
   "contributors": [
-    {
-      "name": "92lleo"
-    },
-    {
-      "name": "Apollon77"
-    },
-    {
-      "name": "iobroker-community-adapters",
-      "email": "mcm57@gmx.at"
-    }
+    "92lleo",
+    "Apollon77",
+    "iobroker-community-adapters <mcm57@gmx.at>"
   ],
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.solaredge",
   "license": "MIT",
