@@ -11,6 +11,7 @@
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.solaredge",
   "license": "MIT",
   "keywords": [
+    "ioBroker",
     "solaredge",
     "energy",
     "power",
