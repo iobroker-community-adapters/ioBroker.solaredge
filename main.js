@@ -62,6 +62,16 @@ async function checkStatesCreationNeeded(){
         await checkStateCreationNeeded('currentFlowGrid');
         await checkStateCreationNeeded('currentFlowLoad');
         await checkStateCreationNeeded('currentFlowPv');
+        await checkStateCreationNeeded('powerUnit'); // W or kW 
+        await checkStateCreationNeeded('feedToBattery'); // true: battery charging
+        await checkStateCreationNeeded('batteryStatus'); 
+        await checkStateCreationNeeded('batteryPowerFlow'); // power from/to battery
+        await checkStateCreationNeeded('batteryChargeLevel'); 
+        await checkStateCreationNeeded('feedToGrid'); 
+        await checkStateCreationNeeded('gridPowerFlow'); 
+        await checkStateCreationNeeded('housePowerFlow');
+        await checkStateCreationNeeded('pvPowerFlow'); // power from pv
+        await checkStateCreationNeeded('pvStatus'); // active, idle, disabled
     }
 }
 
@@ -154,6 +164,86 @@ async function main() {
                         desc: 'last day energy in Wh'
                     });
                     if (adapter.config.currentPowerFlow) {
+                        await adapter.createState('', siteid, 'powerUnit', {
+                            name: "powerUnit",
+                            type: 'string',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'power unit (W or kW)'
+                        });
+                        await adapter.createState('', siteid, 'feedToBattery', {
+                            name: "feedToBattery",
+                            type: 'boolean',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'true: feeding power to battery, false; retrieving power from battery'
+                        });
+                        await adapter.createState('', siteid, 'batteryStatus', {
+                            name: "batteryStatus",
+                            type: 'string',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'PV battery status'
+                        });
+                        await adapter.createState('', siteid, 'batteryChargeLevel', {
+                            name: "batteryChargeLevel",
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'PV battery charge level in %'
+                        });
+                        await adapter.createState('', siteid, 'batteryPowerFlow', {
+                            name: "batteryPowerFlow",
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'Power (W / kW) flowing from/to battery'
+                        });
+                        await adapter.createState('', siteid, 'feedToGrid', {
+                            name: "feedToGrid",
+                            type: 'boolean',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'true: feeding power to grid, false; retrieving power from grid'
+                        });
+                        await adapter.createState('', siteid, 'gridPowerFlow', {
+                            name: "gridPowerFlow",
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'Power (W / kW) flowing from/to grid'
+                        });
+                        await adapter.createState('', siteid, 'housePowerFlow', {
+                            name: "housePowerFlow",
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'Power (W / kW) flowing to house'
+                        });
+                        await adapter.createState('', siteid, 'pvPowerFlow', {
+                            name: "pvPowerFlow",
+                            type: 'number',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'Power (W / kW) flowing to house'
+                        });
+                        await adapter.createState('', siteid, 'pvStatus', {
+                            name: "pvStatus",
+                            type: 'string',
+                            read: true,
+                            write: false,
+                            role: 'value',
+                            desc: 'PV power production status'
+                        });
                         await adapter.createStateAsync('', siteid, 'currentFlowGrid', {
                             name: 'Current flow: Grid',
                             type: 'number',
@@ -207,9 +297,32 @@ async function main() {
                 if (response.data) {
                     const powerFlow = response.data.siteCurrentPowerFlow;
                     if (powerFlow) {
+                        // find out if there is a connection from "load" to "grid",
+                        // which means that the inverter feeds energy to the grid since there is enough energy available
+                        // and if battery is loading or unloading
+                        var feedToGrid = false;
+                        var feedToBattery = false;
+                        for (let i in powerFlow.connections) {
+                            if(powerFlow.connections[i].from.toLowerCase() == "load" && powerFlow.connections[i].to.toLowerCase() == "grid") {
+                                feedToGrid = true;
+                            }
+                            if(powerFlow.connections[i].from.toLowerCase() == "load" && powerFlow.connections[i].to.toLowerCase() == "storage") {
+                                feedToBattery = true;
+                            }
+                        }
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowGrid`, powerFlow.GRID ? powerFlow.GRID.currentPower : 0, true);
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowLoad`, powerFlow.LOAD ? powerFlow.LOAD.currentPower : 0, true);
                         await adapter.setStateChangedAsync(`${siteid}.currentFlowPv`, powerFlow.PV ? powerFlow.PV.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.powerUnit`, powerFlow.unit, true);
+                        await adapter.setStateChangedAsync(`${siteid}.feedToBattery`, feedToBattery, true);
+                        await adapter.setStateChangedAsync(`${siteid}.batteryStatus`, powerFlow.STORAGE ? powerFlow.STORAGE.status : "unknown", true);
+                        await adapter.setStateChangedAsync(`${siteid}.batteryPowerFlow`, powerFlow.STORAGE ? powerFlow.STORAGE.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.batteryChargeLevel`, powerFlow.STORAGE.chargeLevel, true);
+                        await adapter.setStateChangedAsync(`${siteid}.feedToGrid`, feedToGrid, true);
+                        await adapter.setStateChangedAsync(`${siteid}.gridPowerFlow`, powerFlow.GRID ? powerFlow.GRID.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.housePowerFlow`, powerFlow.LOAD ? powerFlow.LOAD.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.pvPowerFlow`, powerFlow.PV ? powerFlow.PV.currentPower : 0, true);
+                        await adapter.setStateChangedAsync(`${siteid}.pvStatus`, powerFlow.PV ? powerFlow.PV.status : "unknown", true);
                     }
                 }
             }
