@@ -72,61 +72,64 @@ async function main() {
             timeout: 15 * 1000,
         };
 
-        // create all states if not yet existing
-        await adapter.createStateNotExists('', siteid, 'lastUpdateTime', {
-            name: 'lastUpdateTime',
-            type: 'string',
-            role: 'date',
-            read: true,
-            write: false,
-            desc: 'Last update from inverter'
-        });
-        await adapter.createStateNotExists('', siteid, 'currentPower', {
-            name: 'currentPower',
-            type: 'number',
-            read: true,
-            write: false,
-            role: 'value.power',
-            desc: 'current power in W',
-            unit: 'W',
-        });
-        await adapter.createStateNotExists('', siteid, 'lifeTimeData', {
-            name: 'lifeTimeData',
-            type: 'number',
-            read: true,
-            write: false,
-            role: 'value.energy.produced',
-            unit: 'Wh',
-            desc: 'Lifetime energy in Wh'
-        });
-        await adapter.createStateNotExists('', siteid, 'lastYearData', {
-            name: 'lastYearData',
-            type: 'number',
-            read: true,
-            write: false,
-            unit: 'Wh',
-            role: 'value.energy.produced',
-            desc: 'last year energy in Wh'
-        });
-        await adapter.createStateNotExists('', siteid, 'lastMonthData', {
-            name: 'lastMonthData',
-            type: 'number',
-            read: true,
-            write: false,
-            role: 'value.energy.produced',
-            unit: 'Wh',
-            desc: 'last month energy in Wh'
-        });
-        await adapter.createStateNotExists('', siteid, 'lastDayData', {
-            name: 'lastDayData',
-            type: 'number',
-            read: true,
-            write: false,
-            unit: 'Wh',
-            role: 'value.energy.produced',
-            desc: 'last day energy in Wh'
-        });
-        if (adapter.config.currentPowerFlow) {
+        // create state objects only on first run; they persist across scheduled restarts
+        if (!(await adapter.getObjectAsync(`${siteid}.lifeTimeData`))) {
+            adapter.log.debug('creating states');
+            await adapter.createStateNotExists('', siteid, 'lastUpdateTime', {
+                name: 'lastUpdateTime',
+                type: 'string',
+                role: 'date',
+                read: true,
+                write: false,
+                desc: 'Last update from inverter'
+            });
+            await adapter.createStateNotExists('', siteid, 'currentPower', {
+                name: 'currentPower',
+                type: 'number',
+                read: true,
+                write: false,
+                role: 'value.power',
+                desc: 'current power in W',
+                unit: 'W',
+            });
+            await adapter.createStateNotExists('', siteid, 'lifeTimeData', {
+                name: 'lifeTimeData',
+                type: 'number',
+                read: true,
+                write: false,
+                role: 'value.energy.produced',
+                unit: 'Wh',
+                desc: 'Lifetime energy in Wh'
+            });
+            await adapter.createStateNotExists('', siteid, 'lastYearData', {
+                name: 'lastYearData',
+                type: 'number',
+                read: true,
+                write: false,
+                unit: 'Wh',
+                role: 'value.energy.produced',
+                desc: 'last year energy in Wh'
+            });
+            await adapter.createStateNotExists('', siteid, 'lastMonthData', {
+                name: 'lastMonthData',
+                type: 'number',
+                read: true,
+                write: false,
+                role: 'value.energy.produced',
+                unit: 'Wh',
+                desc: 'last month energy in Wh'
+            });
+            await adapter.createStateNotExists('', siteid, 'lastDayData', {
+                name: 'lastDayData',
+                type: 'number',
+                read: true,
+                write: false,
+                unit: 'Wh',
+                role: 'value.energy.produced',
+                desc: 'last day energy in Wh'
+            });
+        }
+        if (adapter.config.currentPowerFlow && !(await adapter.getObjectAsync(`${siteid}.currentFlowGrid`))) {
             await adapter.createStateNotExists('', siteid, 'currentFlowGrid', {
                 name: 'Current flow: Grid',
                 type: 'number',
