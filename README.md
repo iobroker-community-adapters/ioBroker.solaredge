@@ -27,15 +27,40 @@ For more details and for information how to disable the error reporting see [Sen
 
 ## Solaredge Adapter for ioBroker 
 
-Get data from solaredge monitoring portal.
-Currently, only the /overview data point is used to get the current power and day/month/year/lifetime energy readings.
+Get data from the SolarEdge monitoring portal via the SolarEdge Monitoring API v2.
+The adapter reads current power and day/month/year/lifetime energy, optionally the current power flow
+(power flow requires an Advanced Monitoring tier at SolarEdge).
 
-You can also enable modbus on your solaredge device if it's a newer one and read the data directly. 
+You can also enable modbus on your solaredge device if it's a newer one and read the data directly.
 
-You need your site id and api key to use this adapter. To get these, go to https://monitoring.solaredge.com  
-- site id: log in, site id is the "ID" on the right, e.g., 12345.  
-- api key: log in, go to the admin settings and enable api access there. If you don't see admin settings, send mail to solaredge to enable admin for your account.
+### Setup
 
+The Monitoring API v1 (api key from the monitoring portal) is shut down by SolarEdge on 2026-11-01.
+v1 api keys do not work with v2.
+
+**Site id:** log in at https://monitoring.solaredge.com, the site id is the "ID" shown for your site, e.g., 12345.
+
+**Site Access (OAuth2, homeowners):**
+1. Create an account at the [SolarEdge developer portal](https://developer.solaredge.com/) and create a
+   Site Access application with scope `SITE_DATA`.
+   As redirect URI enter the value shown in the instance settings (default `https://localhost/`).
+   The redirect target does not need to exist.
+2. Enter client id and client secret of the application in the instance settings and save.
+3. Copy the authorization link shown in the instance settings, open it in your browser, log in and grant access.
+4. The browser is redirected to the redirect URI (the page may fail to load). Copy the complete URL from the
+   address bar into the field "Authorization code or redirect URL" and save. Authorization codes expire quickly,
+   the instance runs right after saving and requests the tokens.
+
+The tokens are stored encrypted in `solaredge.X.info.auth` and are refreshed automatically.
+If the authorization expires or is revoked (refresh tokens expire after 30 days without use),
+repeat steps 3 and 4.
+
+**Fleet Access (API key, installers):** select access type "Fleet Access" and enter the App API key.
+
+**Credits:** each API call consumes credits of your SolarEdge app (free tier: 2000 credits/month).
+With the default schedule (every 15 minutes) the adapter needs about 2 calls per run,
+plus one call per hour for month and one per day for year energy.
+Disable the energy values you don't need or increase the schedule interval if you run out of credits.
 
 ## Credits
 
@@ -49,6 +74,8 @@ This adapter would not have been possible without the great work of @92lleo (htt
 ### **WORK IN PROGRESS**
 - (mcm1957) BREAKING: Adapter has been migrated to SolarEdge Monitoring API v2. A new API key must be generated at https://developer.solaredge.com/ — v1 keys are not valid in v2.
 - (mcm1957) BREAKING: The `currentPowerFlow` feature now requires a Business Pro or Enterprise tier subscription at SolarEdge.
+- (Garfonso) OAuth2 Site Access (client id/secret of your own SolarEdge app) has been added, Fleet Access API key is optional. See README for setup.
+- (Garfonso) Time ranges are now sent in local time and API units are converted correctly.
 - (copilot) Adapter requires node.js >= 22 now
 - (iobroker-bot) Adapter requires node.js >= 20 now.
 - (copilot) Adapter requires admin >= 7.7.22 now
