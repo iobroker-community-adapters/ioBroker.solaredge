@@ -166,7 +166,11 @@
   },
   "native": {
     "siteid": "",
-    "apikey": ""
+    "apikey": "",
+    "currentPowerFlow": false,
+    "retrieveLastDayData": true,
+    "retrieveLastMonthData": true,
+    "retrieveLastYearData": true
   },
   "objects": [],
   "instanceObjects": []

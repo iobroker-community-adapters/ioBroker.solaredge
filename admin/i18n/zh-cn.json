@@ -2,5 +2,8 @@
     "instructions": "在下面输入您的逆变器站点 ID 和 Solaredge 监控 API 密钥。该 API 的限制为 300 个请求/天，因此不要将调度设置得太低。 Solaredge 端的数据每 15 分钟更新一次。",
     "Site ID": "Site ID",
     "API key": "API 密钥",
-    "Read current power flow": "读取当前功率流"
+    "Read current power flow": "读取当前功率流",
+    "Retrieve today's energy": "获取今日能量",
+    "Retrieve this month's energy": "获取本月能量",
+    "Retrieve yearly and lifetime energy": "获取年度和累计能量"
 }

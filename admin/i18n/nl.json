@@ -2,5 +2,8 @@
     "instructions": "Voer hieronder uw site-ID van uw omvormer en de API-sleutel voor monitoring van de solaredge in. De API heeft een limiet van 300 verzoeken/dag, dus stel de planning niet te laag in. De gegevens worden aan de kant van solaredge slechts elke 15 minuten bijgewerkt.",
     "Site ID": "Site ID",
     "API key": "API sleutel",
-    "Read current power flow": "Lees de huidige stroomstroom"
+    "Read current power flow": "Lees de huidige stroomstroom",
+    "Retrieve today's energy": "Haal energie van vandaag op",
+    "Retrieve this month's energy": "Haal energie van deze maand op",
+    "Retrieve yearly and lifetime energy": "Haal jaarlijkse en totale energie op"
 }

@@ -30,6 +30,30 @@
       "sm": 12,
       "md": 6,
       "lg": 4
+    },
+    "retrieveLastDayData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve today's energy",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "retrieveLastMonthData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve this month's energy",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "retrieveLastYearData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve yearly and lifetime energy",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
     }
   }
 }
