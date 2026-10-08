@@ -111,7 +111,6 @@ async function main() {
             const now = new Date();
             const oneHourAgo = new Date(now - 3600000);
             const startOfYear = new Date(now.getFullYear(), 0, 1);
-            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
             // Fetch all data in parallel
             const [siteResp, overviewResp, powerResp, lifetimeEnergyResp, monthEnergyResp] = await Promise.all([
