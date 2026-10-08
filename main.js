@@ -18,7 +18,6 @@ const adapterName = require('./package.json').name.split('.').pop();
  * @type {ioBroker.Adapter}
  */
 let adapter;
-let createStates;
 let siteid;
 
 /**
@@ -31,38 +30,6 @@ function startAdapter(options) {
         name: adapterName,
         ready: main, // Main method defined below for readability
     }));
-}
-
-async function checkStateCreationNeeded(stateName){
-    let state;
-    try {
-        state = await adapter.getState(`solaredge.${adapter.instance}.${siteid}.${stateName}`);
-    } catch (error) {
-        // state does not exist, ignore
-    }
-
-    if (!state) {
-        adapter.log.info(`state ${stateName} does not exist, will be created`);
-        createStates = true;
-    } else {
-        adapter.log.debug(`state ${stateName} exists`);
-        createStates |= false;
-    }
-}
-
-async function checkStatesCreationNeeded(){
-    await checkStateCreationNeeded('lastUpdateTime');
-    await checkStateCreationNeeded('currentPower');
-    await checkStateCreationNeeded('lifeTimeData');
-    await checkStateCreationNeeded('lastYearData');
-    await checkStateCreationNeeded('lastMonthData');
-    await checkStateCreationNeeded('lastDayData');
-
-    if (adapter.config.currentPowerFlow) {
-        await checkStateCreationNeeded('currentFlowGrid');
-        await checkStateCreationNeeded('currentFlowLoad');
-        await checkStateCreationNeeded('currentFlowPv');
-    }
 }
 
 function formatDate(date) {
@@ -105,7 +72,89 @@ async function main() {
             timeout: 15 * 1000,
         };
 
-        await checkStatesCreationNeeded();
+        // create all states if not yet existing
+        await adapter.createStateNotExists('', siteid, 'lastUpdateTime', {
+            name: 'lastUpdateTime',
+            type: 'string',
+            role: 'date',
+            read: true,
+            write: false,
+            desc: 'Last update from inverter'
+        });
+        await adapter.createStateNotExists('', siteid, 'currentPower', {
+            name: 'currentPower',
+            type: 'number',
+            read: true,
+            write: false,
+            role: 'value.power',
+            desc: 'current power in W',
+            unit: 'W',
+        });
+        await adapter.createStateNotExists('', siteid, 'lifeTimeData', {
+            name: 'lifeTimeData',
+            type: 'number',
+            read: true,
+            write: false,
+            role: 'value.energy.produced',
+            unit: 'Wh',
+            desc: 'Lifetime energy in Wh'
+        });
+        await adapter.createStateNotExists('', siteid, 'lastYearData', {
+            name: 'lastYearData',
+            type: 'number',
+            read: true,
+            write: false,
+            unit: 'Wh',
+            role: 'value.energy.produced',
+            desc: 'last year energy in Wh'
+        });
+        await adapter.createStateNotExists('', siteid, 'lastMonthData', {
+            name: 'lastMonthData',
+            type: 'number',
+            read: true,
+            write: false,
+            role: 'value.energy.produced',
+            unit: 'Wh',
+            desc: 'last month energy in Wh'
+        });
+        await adapter.createStateNotExists('', siteid, 'lastDayData', {
+            name: 'lastDayData',
+            type: 'number',
+            read: true,
+            write: false,
+            unit: 'Wh',
+            role: 'value.energy.produced',
+            desc: 'last day energy in Wh'
+        });
+        if (adapter.config.currentPowerFlow) {
+            await adapter.createStateNotExists('', siteid, 'currentFlowGrid', {
+                name: 'Current flow: Grid',
+                type: 'number',
+                read: true,
+                write: false,
+                unit: 'kW',
+                role: 'value.power.consumed',
+                desc: 'Current usage from energy grid'
+            });
+            await adapter.createStateNotExists('', siteid, 'currentFlowLoad', {
+                name: 'Current flow: Load',
+                type: 'number',
+                read: true,
+                write: false,
+                unit: 'kW',
+                role: 'value.power.consumed',
+                desc: 'Current total usage'
+            });
+            await adapter.createStateNotExists('', siteid, 'currentFlowPv', {
+                name: 'Current flow: PV',
+                type: 'number',
+                read: true,
+                write: false,
+                unit: 'kW',
+                role: 'value.power.produced',
+                desc: 'Current production from PV'
+            });
+        }
 
         try {
             const now = new Date();
@@ -137,103 +186,6 @@ async function main() {
             );
 
             adapter.log.debug(`Current power for ${siteid}: ${currentPower} W`);
-
-            if (createStates) {
-                adapter.log.debug('creating states');
-                // create all states, only needed on first start or after state deletion
-
-                // last update time
-                await adapter.createStateAsync('', siteid, 'lastUpdateTime', {
-                    name: 'lastUpdateTime',
-                    type: 'string',
-                    role: 'date',
-                    read: true,
-                    write: false,
-                    desc: 'Last update from inverter'
-                });
-
-                await adapter.createStateAsync('', siteid, 'currentPower', {
-                    name: 'currentPower',
-                    type: 'number',
-                    read: true,
-                    write: false,
-                    role: 'value.power',
-                    desc: 'current power in W',
-                    unit: 'W',
-                });
-
-                await adapter.createStateAsync('', siteid, 'lifeTimeData', {
-                    name: 'lifeTimeData',
-                    type: 'number',
-                    read: true,
-                    write: false,
-                    role: 'value.energy.produced',
-                    unit: 'Wh',
-                    desc: 'Lifetime energy in Wh'
-                });
-
-                await adapter.createStateAsync('', siteid, 'lastYearData', {
-                    name: 'lastYearData',
-                    type: 'number',
-                    read: true,
-                    write: false,
-                    unit: 'Wh',
-                    role: 'value.energy.produced',
-                    desc: 'last year energy in Wh'
-                });
-
-                await adapter.createStateAsync('', siteid, 'lastMonthData', {
-                    name: 'lastMonthData',
-                    type: 'number',
-                    read: true,
-                    write: false,
-                    role: 'value.energy.produced',
-                    unit: 'Wh',
-                    desc: 'last month energy in Wh'
-                });
-
-                await adapter.createStateAsync('', siteid, 'lastDayData', {
-                    name: 'lastDayData',
-                    type: 'number',
-                    read: true,
-                    write: false,
-                    unit: 'Wh',
-                    role: 'value.energy.produced',
-                    desc: 'last day energy in Wh'
-                });
-                if (adapter.config.currentPowerFlow) {
-                    await adapter.createStateAsync('', siteid, 'currentFlowGrid', {
-                        name: 'Current flow: Grid',
-                        type: 'number',
-                        read: true,
-                        write: false,
-                        unit: 'kW',
-                        role: 'value.power.consumed',
-                        desc: 'Current usage from energy grid'
-                    });
-                    await adapter.createStateAsync('', siteid, 'currentFlowLoad', {
-                        name: 'Current flow: Load',
-                        type: 'number',
-                        read: true,
-                        write: false,
-                        unit: 'kW',
-                        role: 'value.power.consumed',
-                        desc: 'Current total usage'
-                    });
-                    await adapter.createStateAsync('', siteid, 'currentFlowPv', {
-                        name: 'Current flow: PV',
-                        type: 'number',
-                        read: true,
-                        write: false,
-                        unit: 'kW',
-                        role: 'value.power.produced',
-                        desc: 'Current production from PV'
-                    });
-                }
-
-                createStates = false;
-            }
-
             adapter.log.debug('updating states');
 
             await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, site.lastUpdateTime, true);
