@@ -11,6 +11,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
+const { formatDate, convertToWh, convertToW, getLastEntry, getLastNonNull, sumNonNull } = require('./lib/helpers');
 const adapterName = require('./package.json').name.split('.').pop();
 
 /**
@@ -30,29 +31,6 @@ function startAdapter(options) {
         name: adapterName,
         ready: main, // Main method defined below for readability
     }));
-}
-
-function formatDate(date) {
-    return date.toISOString().slice(0, 19); // "2026-10-08T12:00:00"
-}
-
-function convertToWh(value, unit) {
-    if (value === null || value === undefined) return 0;
-    if (unit === 'kWh') return value * 1000;
-    return value;
-}
-
-function getLastNonNull(values) {
-    if (!values || values.length === 0) return 0;
-    for (let i = values.length - 1; i >= 0; i--) {
-        if (values[i].value !== null && values[i].value !== undefined) return values[i].value;
-    }
-    return 0;
-}
-
-function sumNonNull(values) {
-    if (!values || values.length === 0) return 0;
-    return values.reduce((sum, v) => sum + (v.value !== null && v.value !== undefined ? v.value : 0), 0);
 }
 
 async function main() {
@@ -200,10 +178,10 @@ async function main() {
             const powerValues = (powerResp.data && powerResp.data.values) || [];
 
             // Derive lastUpdateTime from the last power value timestamp (avoids a separate site-details call)
-            const lastPowerEntry = powerValues.filter(v => v.value !== null && v.value !== undefined).pop();
+            const lastPowerEntry = getLastEntry(powerValues);
             const lastUpdateTime = lastPowerEntry ? lastPowerEntry.date || lastPowerEntry.timestamp : null;
 
-            const currentPower = getLastNonNull(powerValues);
+            const currentPower = convertToW(lastPowerEntry ? lastPowerEntry.value : 0, powerResp.data && powerResp.data.unit);
 
             adapter.log.debug(`Current power for ${siteid}: ${currentPower} W`);
             adapter.log.debug('updating states');
@@ -221,12 +199,13 @@ async function main() {
             }
             if (yearEnergyResp) {
                 const yearValues = (yearEnergyResp.data && yearEnergyResp.data.values) || [];
-                await adapter.setStateAsync(`${siteid}.lifeTimeData`, sumNonNull(yearValues), true);
-                await adapter.setStateAsync(`${siteid}.lastYearData`, getLastNonNull(yearValues), true);
+                const yearUnit = yearEnergyResp.data && yearEnergyResp.data.unit;
+                await adapter.setStateAsync(`${siteid}.lifeTimeData`, convertToWh(sumNonNull(yearValues), yearUnit), true);
+                await adapter.setStateAsync(`${siteid}.lastYearData`, convertToWh(getLastNonNull(yearValues), yearUnit), true);
             }
             if (monthEnergyResp) {
                 const monthValues = (monthEnergyResp.data && monthEnergyResp.data.values) || [];
-                await adapter.setStateAsync(`${siteid}.lastMonthData`, getLastNonNull(monthValues), true);
+                await adapter.setStateAsync(`${siteid}.lastMonthData`, convertToWh(getLastNonNull(monthValues), monthEnergyResp.data && monthEnergyResp.data.unit), true);
             }
         } catch (error) {
             adapter.log.error(`Cannot read data from solaredge cloud: ${error.response && error.response.data ?
@@ -265,7 +244,7 @@ async function main() {
                 await adapter.setForeignObjectAsync(`system.adapter.${adapter.namespace}`, instObj);
             }
         } catch (err) {
-            this.log.error(`Could not check or adjust the schedule: ${err.message}`);
+            adapter.log.error(`Could not check or adjust the schedule: ${err.message}`);
         }
 
         adapter.stop();
