@@ -164,25 +164,37 @@ async function main() {
             const oneHourAgo = new Date(now - 3600000);
             const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-            // Fetch all data in parallel
-            const [siteResp, overviewResp, powerResp, lifetimeEnergyResp, monthEnergyResp] = await Promise.all([
-                axios(baseUrl, axiosConfig),
+            // Energy totals change slowly: YEAR (lifeTimeData + lastYearData) once per day,
+            // MONTH (lastMonthData) once per hour. Check state ts to decide whether to fetch.
+            // setStateAsync is used for these states (not setStateChangedAsync) so ts always
+            // reflects the last fetch time, not only the last value change.
+            const [lifetimeState, monthState] = await Promise.all([
+                adapter.getStateAsync(`${siteid}.lifeTimeData`),
+                adapter.getStateAsync(`${siteid}.lastMonthData`),
+            ]);
+            const fetchYearEnergy = !lifetimeState || !lifetimeState.ts ||
+                (now.getTime() - lifetimeState.ts) >= 24 * 60 * 60 * 1000;
+            const fetchMonthEnergy = !monthState || !monthState.ts ||
+                (now.getTime() - monthState.ts) >= 60 * 60 * 1000;
+
+            adapter.log.debug(`fetchYearEnergy: ${fetchYearEnergy}, fetchMonthEnergy: ${fetchMonthEnergy}`);
+
+            // Fetch live data every cycle; energy calls are conditional
+            const [overviewResp, powerResp, yearEnergyResp, monthEnergyResp] = await Promise.all([
                 axios(`${baseUrl}/overview`, axiosConfig),
                 axios(`${baseUrl}/power?resolution=QUARTER_HOUR&unit=W&from=${formatDate(oneHourAgo)}&to=${formatDate(now)}`, axiosConfig),
-                axios(`${baseUrl}/energy?resolution=YEAR&unit=WH&from=2000-01-01T00:00:00&to=${formatDate(now)}`, axiosConfig),
-                axios(`${baseUrl}/energy?resolution=MONTH&unit=WH&from=${formatDate(startOfYear)}&to=${formatDate(now)}`, axiosConfig),
+                fetchYearEnergy ? axios(`${baseUrl}/energy?resolution=YEAR&unit=WH&from=2000-01-01T00:00:00&to=${formatDate(now)}`, axiosConfig) : null,
+                fetchMonthEnergy ? axios(`${baseUrl}/energy?resolution=MONTH&unit=WH&from=${formatDate(startOfYear)}&to=${formatDate(now)}`, axiosConfig) : null,
             ]);
 
-            const site = siteResp.data;
             const overview = overviewResp.data;
             const powerValues = (powerResp.data && powerResp.data.values) || [];
-            const yearValues = (lifetimeEnergyResp.data && lifetimeEnergyResp.data.values) || [];
-            const monthValues = (monthEnergyResp.data && monthEnergyResp.data.values) || [];
+
+            // Derive lastUpdateTime from the last power value timestamp (avoids a separate site-details call)
+            const lastPowerEntry = powerValues.filter(v => v.value !== null && v.value !== undefined).pop();
+            const lastUpdateTime = lastPowerEntry ? lastPowerEntry.date || lastPowerEntry.timestamp : null;
 
             const currentPower = getLastNonNull(powerValues);
-            const lifeTimeData = sumNonNull(yearValues);
-            const lastYearData = getLastNonNull(yearValues);
-            const lastMonthData = getLastNonNull(monthValues);
             const lastDayData = convertToWh(
                 overview.production ? overview.production.total : 0,
                 overview.production ? overview.production.unit : 'Wh'
@@ -191,12 +203,19 @@ async function main() {
             adapter.log.debug(`Current power for ${siteid}: ${currentPower} W`);
             adapter.log.debug('updating states');
 
-            await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, site.lastUpdateTime, true);
+            await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, lastUpdateTime, true);
             await adapter.setStateChangedAsync(`${siteid}.currentPower`, currentPower, true);
-            await adapter.setStateChangedAsync(`${siteid}.lifeTimeData`, lifeTimeData, true);
-            await adapter.setStateChangedAsync(`${siteid}.lastYearData`, lastYearData, true);
-            await adapter.setStateChangedAsync(`${siteid}.lastMonthData`, lastMonthData, true);
             await adapter.setStateChangedAsync(`${siteid}.lastDayData`, lastDayData, true);
+
+            if (yearEnergyResp) {
+                const yearValues = (yearEnergyResp.data && yearEnergyResp.data.values) || [];
+                await adapter.setStateAsync(`${siteid}.lifeTimeData`, sumNonNull(yearValues), true);
+                await adapter.setStateAsync(`${siteid}.lastYearData`, getLastNonNull(yearValues), true);
+            }
+            if (monthEnergyResp) {
+                const monthValues = (monthEnergyResp.data && monthEnergyResp.data.values) || [];
+                await adapter.setStateAsync(`${siteid}.lastMonthData`, getLastNonNull(monthValues), true);
+            }
         } catch (error) {
             adapter.log.error(`Cannot read data from solaredge cloud: ${error.response && error.response.data ?
                 JSON.stringify(error.response.data) : (error.response && error.response.status ? error.response.status : error)}`);
