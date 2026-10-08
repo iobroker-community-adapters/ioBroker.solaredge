@@ -166,12 +166,48 @@
   },
   "native": {
     "siteid": "",
+    "authType": "oauth",
     "apikey": "",
+    "clientId": "",
+    "clientSecret": "",
+    "redirectUri": "https://localhost/",
+    "authCode": "",
     "currentPowerFlow": false,
     "retrieveLastDayData": true,
     "retrieveLastMonthData": true,
     "retrieveLastYearData": true
   },
+  "encryptedNative": [
+    "apikey",
+    "clientSecret"
+  ],
+  "protectedNative": [
+    "apikey",
+    "clientSecret",
+    "authCode"
+  ],
   "objects": [],
-  "instanceObjects": []
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.auth",
+      "type": "state",
+      "common": {
+        "name": "OAuth2 tokens (encrypted)",
+        "type": "string",
+        "role": "text",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    }
+  ]
 }

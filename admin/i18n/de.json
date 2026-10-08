@@ -1,9 +1,23 @@
 {
-    "instructions": "Geben Sie unten Ihre Wechselrichter-Standort-ID und den API-Schlüssel für die Solaredge-Überwachung ein. Die API hat ein Limit von 300 Anfragen/Tag, also stellen Sie die Planung nicht zu niedrig ein. Die Daten werden auf der Solaredge-Seite nur alle 15 Minuten aktualisiert.",
+    "instructions": "Geben Sie unten die Site-ID Ihres Wechselrichters und die Zugangsdaten für die SolarEdge Monitoring API v2 ein. API-Aufrufe verbrauchen Credits Ihrer SolarEdge-App (kostenlos: 2000 Credits/Monat), stellen Sie die Planung also nicht zu niedrig ein. Die Daten werden auf der SolarEdge-Seite nur alle 15 Minuten aktualisiert.",
     "Site ID": "Site ID",
     "API key": "API-Schlüssel",
     "Read current power flow": "Aktuellen Leistungsfluss ablesen",
     "Retrieve today's energy": "Heutige Energiedaten abrufen",
     "Retrieve this month's energy": "Energiedaten des aktuellen Monats abrufen",
-    "Retrieve yearly and lifetime energy": "Jahres- und Gesamtenergie abrufen"
+    "Retrieve yearly and lifetime energy": "Jahres- und Gesamtenergie abrufen",
+    "Access type": "Zugangsart",
+    "Site Access (OAuth2, homeowners)": "Site Access (OAuth2, Anlagenbesitzer)",
+    "Fleet Access (API key, installers)": "Fleet Access (API-Schlüssel, Installateure)",
+    "Site Access (OAuth2)": "Site Access (OAuth2)",
+    "oauthInstructions": "1. Im SolarEdge-Entwicklerportal ein Konto und eine Site-Access-Anwendung mit dem Scope SITE_DATA anlegen. Als Redirect-URI der Anwendung die URI von unten verwenden. 2. Client-ID und Client-Secret der Anwendung eintragen und speichern. 3. Den Autorisierungslink öffnen, anmelden und Zugriff gewähren. 4. Der Browser wird auf die Redirect-URI weitergeleitet (die Seite lädt evtl. nicht). Die komplette URL aus der Adresszeile in das Feld unten kopieren und speichern. Der Adapter holt die Tokens beim nächsten Lauf. Läuft die Autorisierung ab, Schritte 3 und 4 wiederholen.",
+    "SolarEdge developer portal": "SolarEdge-Entwicklerportal",
+    "Redirect URI": "Redirect-URI",
+    "Must be identical to the redirect URI of your SolarEdge app": "Muss identisch mit der Redirect-URI Ihrer SolarEdge-App sein",
+    "Client ID": "Client-ID",
+    "Client secret": "Client-Secret",
+    "Authorization link": "Autorisierungslink",
+    "Copy and open this link in your browser": "Diesen Link kopieren und im Browser öffnen",
+    "Authorization code or redirect URL": "Autorisierungscode oder Redirect-URL",
+    "Paste the complete URL from the browser address bar after granting access, then save": "Nach dem Gewähren des Zugriffs die komplette URL aus der Adresszeile einfügen und speichern"
 }

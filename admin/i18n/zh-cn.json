@@ -5,5 +5,19 @@
     "Read current power flow": "读取当前功率流",
     "Retrieve today's energy": "获取今日能量",
     "Retrieve this month's energy": "获取本月能量",
-    "Retrieve yearly and lifetime energy": "获取年度和累计能量"
+    "Retrieve yearly and lifetime energy": "获取年度和累计能量",
+    "Access type": "Access type",
+    "Site Access (OAuth2, homeowners)": "Site Access (OAuth2, homeowners)",
+    "Fleet Access (API key, installers)": "Fleet Access (API key, installers)",
+    "Site Access (OAuth2)": "Site Access (OAuth2)",
+    "oauthInstructions": "1. Create an account and a Site Access application with scope SITE_DATA in the SolarEdge developer portal. Use the redirect URI below for the application. 2. Enter client id and client secret of the application and save. 3. Open the authorization link, log in and grant access. 4. The browser is redirected to the redirect URI (the page may not load). Copy the complete URL from the address bar into the field below and save. The adapter requests the tokens on the next run. Repeat steps 3 and 4 if the authorization expires.",
+    "SolarEdge developer portal": "SolarEdge developer portal",
+    "Redirect URI": "Redirect URI",
+    "Must be identical to the redirect URI of your SolarEdge app": "Must be identical to the redirect URI of your SolarEdge app",
+    "Client ID": "Client ID",
+    "Client secret": "Client secret",
+    "Authorization link": "Authorization link",
+    "Copy and open this link in your browser": "Copy and open this link in your browser",
+    "Authorization code or redirect URL": "Authorization code or redirect URL",
+    "Paste the complete URL from the browser address bar after granting access, then save": "Paste the complete URL from the browser address bar after granting access, then save"
 }
