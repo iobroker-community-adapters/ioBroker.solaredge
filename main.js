@@ -49,7 +49,11 @@ function query(params) {
  * @param {string} url
  */
 async function apiGet(auth, url) {
-    const request = async () => axios(url, { headers: await auth.getHeaders(), timeout: 15 * 1000 });
+    const request = async () => {
+        const response = await axios(url, { headers: await auth.getHeaders(), timeout: 15 * 1000 });
+        adapter.log.debug(`GET ${url.replace(/^.*\/v2/, '')}: ${JSON.stringify(response.data)}`);
+        return response;
+    };
     try {
         return await request();
     } catch (error) {
