@@ -7,18 +7,117 @@
       "text": "instructions",
       "sm": 12
     },
-    "siteid": {
+    "authType": {
       "newLine": true,
-      "type": "text",
-      "label": "Site ID",
+      "type": "select",
+      "label": "Access type",
+      "options": [
+        { "label": "Site Access (OAuth2, homeowners)", "value": "oauth" },
+        { "label": "Fleet Access (API key, installers)", "value": "apikey" }
+      ],
       "sm": 12,
       "md": 6,
       "lg": 4
     },
     "apikey": {
       "newLine": true,
-      "type": "text",
+      "type": "password",
       "label": "API key",
+      "hidden": "data.authType !== 'apikey'",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "_oauthHeader": {
+      "newLine": true,
+      "type": "header",
+      "text": "Site Access (OAuth2)",
+      "size": 4,
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12
+    },
+    "_oauthDesc": {
+      "type": "staticText",
+      "text": "oauthInstructions",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12
+    },
+    "_devPortal": {
+      "newLine": true,
+      "type": "staticLink",
+      "text": "SolarEdge developer portal",
+      "href": "https://developer.solaredge.com/",
+      "button": true,
+      "variant": "outlined",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "redirectUri": {
+      "newLine": true,
+      "type": "text",
+      "label": "Redirect URI",
+      "help": "Must be identical to the redirect URI of your SolarEdge app",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "clientId": {
+      "newLine": true,
+      "type": "text",
+      "label": "Client ID",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "clientSecret": {
+      "type": "password",
+      "label": "Client secret",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "_authorizeUrl": {
+      "newLine": true,
+      "type": "pattern",
+      "label": "Authorization link",
+      "help": "Copy and open this link in your browser",
+      "copyToClipboard": true,
+      "pattern": "https://connect.solaredge.com/authorize?response_type=code&client_id=${encodeURIComponent(data.clientId || '')}&redirect_uri=${encodeURIComponent(data.redirectUri || '')}&scope=SITE_DATA&access_duration=24",
+      "hidden": "data.authType === 'apikey' || !data.clientId || !data.redirectUri",
+      "sm": 12
+    },
+    "authCode": {
+      "newLine": true,
+      "type": "text",
+      "label": "Authorization code or redirect URL",
+      "help": "Paste the complete URL from the browser address bar after granting access, then save",
+      "hidden": "data.authType === 'apikey'",
+      "sm": 12
+    },
+    "siteid": {
+      "newLine": true,
+      "type": "text",
+      "label": "Site ID",
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "help": "Filled in automatically from the redirect URL (OAuth2)",
+      "onChange": {
+        "alsoDependsOn": ["authCode"],
+        "calculateFunc": "((data.authCode || '').match(/[?&]site_?id=([^&#\\s]+)/i) || [])[1] || data.siteid",
+        "ignoreOwnChanges": true
+      }
+    },
+    "pauseAtNight": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "No API calls at night",
+      "help": "Uses the location from the system settings. Saves API credits",
       "sm": 12,
       "md": 6,
       "lg": 4
@@ -27,6 +126,30 @@
       "newLine": true,
       "type": "checkbox",
       "label": "Read current power flow",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "retrieveLastDayData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve today's energy",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "retrieveLastMonthData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve this month's energy",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "retrieveLastYearData": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "Retrieve yearly and lifetime energy",
       "sm": 12,
       "md": 6,
       "lg": 4
