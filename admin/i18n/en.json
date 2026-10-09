@@ -1,5 +1,5 @@
 {
-  "instructions": "Enter the site id of your inverter and the credentials for the SolarEdge Monitoring API v2 below. API calls consume credits of your SolarEdge app (free tier: 2000 credits/month), so don't set the schedule too low. The data is only updated every 15 minutes on SolarEdge side.",
+  "instructions": "Enter the credentials for the SolarEdge Monitoring API v2 below. With OAuth2 the site id is taken from the redirect URL; with an API key enter it manually. API calls consume credits of your SolarEdge app (free tier: 2000 credits/month), so don't set the schedule too low. The data is only updated every 15 minutes on SolarEdge side.",
   "Site ID": "Site ID",
   "API key": "API key",
   "Read current power flow": "Read current power flow",
@@ -19,5 +19,6 @@
   "Authorization link": "Authorization link",
   "Copy and open this link in your browser": "Copy and open this link in your browser",
   "Authorization code or redirect URL": "Authorization code or redirect URL",
-  "Paste the complete URL from the browser address bar after granting access, then save": "Paste the complete URL from the browser address bar after granting access, then save"
+  "Paste the complete URL from the browser address bar after granting access, then save": "Paste the complete URL from the browser address bar after granting access, then save",
+  "Filled in automatically from the redirect URL (OAuth2)": "Filled in automatically from the redirect URL (OAuth2)"
 }

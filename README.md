@@ -38,7 +38,7 @@ You can also enable modbus on your solaredge device if it's a newer one and read
 The Monitoring API v1 (api key from the monitoring portal) is shut down by SolarEdge on 2026-11-01.
 v1 api keys do not work with v2.
 
-**Site id:** log in at https://monitoring.solaredge.com, the site id is the "ID" shown for your site, e.g., 12345.
+**Site id:** with OAuth2 the site id is taken from the redirect URL (`site_id=...`) automatically. With an API key, log in at https://monitoring.solaredge.com, the site id is the "ID" shown for your site, e.g., 12345.
 
 **Site Access (OAuth2, homeowners):**
 1. Create an account at the [SolarEdge developer portal](https://developer.solaredge.com/) and create a

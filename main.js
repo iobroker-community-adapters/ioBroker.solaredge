@@ -11,7 +11,7 @@
 
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
-const { SolarEdgeAuth, AuthError, describeError } = require('./lib/auth');
+const { SolarEdgeAuth, AuthError, describeError, extractSiteId } = require('./lib/auth');
 const { formatDate, convertToWh, convertToW, getLastEntry, getLastNonNull, sumNonNull } = require('./lib/helpers');
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -53,16 +53,23 @@ async function apiGet(auth, url) {
 }
 
 async function main() {
-    siteid = adapter.config.siteid;
     const apikey = adapter.config.authType === 'apikey' ? adapter.config.apikey : '';
     const { clientId, clientSecret } = adapter.config;
+    // SolarEdge appends the site id to the redirect URL, so it can be taken from there
+    siteid = adapter.config.siteid || (apikey ? '' : extractSiteId(adapter.config.authCode));
 
     adapter.log.debug(`site id: ${siteid}`);
     adapter.log.debug(`auth type: ${apikey ? 'api key' : 'oauth2'}`);
 
     // adapter only works with siteid and credentials set
     if (!siteid || (!apikey && (!clientId || !clientSecret))) {
-        adapter.log.error(adapter.config.authType === 'apikey' ? 'siteid or api key not set' : 'siteid, client id or client secret not set');
+        if (adapter.config.authType === 'apikey') {
+            adapter.log.error('siteid or api key not set');
+        } else if (!clientId || !clientSecret) {
+            adapter.log.error('client id or client secret not set');
+        } else {
+            adapter.log.error('siteid not set: paste the complete redirect URL (including site_id) or enter the site id manually');
+        }
         adapter.stop();
     } else {
         const baseUrl = `https://monitoringapi.solaredge.com/v2/sites/${siteid}`;
@@ -266,15 +273,25 @@ async function main() {
         adapter.log.debug('Done, stopping...');
 
         // Change the schedule to a random seconds to spread the calls over the minute
+        // and remember a site id taken from the redirect URL
         try {
             const instObj = await adapter.getForeignObjectAsync(`system.adapter.${adapter.namespace}`);
+            let changed = false;
             if (instObj && instObj.common && instObj.common.schedule && instObj.common.schedule === '*/15 * * * *') {
                 instObj.common.schedule = `${Math.floor(Math.random() * 60)} */15 * * * *`;
                 adapter.log.info(`Default schedule found and adjusted to spread calls better over the minute`);
+                changed = true;
+            }
+            if (instObj && !instObj.native.siteid) {
+                instObj.native.siteid = siteid;
+                adapter.log.info(`Site id ${siteid} taken from the redirect URL`);
+                changed = true;
+            }
+            if (changed) {
                 await adapter.setForeignObjectAsync(`system.adapter.${adapter.namespace}`, instObj);
             }
         } catch (err) {
-            adapter.log.error(`Could not check or adjust the schedule: ${err.message}`);
+            adapter.log.error(`Could not check or adjust the instance settings: ${err.message}`);
         }
 
         adapter.stop();

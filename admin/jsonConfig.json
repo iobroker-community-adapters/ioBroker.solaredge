@@ -7,14 +7,6 @@
       "text": "instructions",
       "sm": 12
     },
-    "siteid": {
-      "newLine": true,
-      "type": "text",
-      "label": "Site ID",
-      "sm": 12,
-      "md": 6,
-      "lg": 4
-    },
     "authType": {
       "newLine": true,
       "type": "select",
@@ -106,6 +98,20 @@
       "help": "Paste the complete URL from the browser address bar after granting access, then save",
       "hidden": "data.authType === 'apikey'",
       "sm": 12
+    },
+    "siteid": {
+      "newLine": true,
+      "type": "text",
+      "label": "Site ID",
+      "sm": 12,
+      "md": 6,
+      "lg": 4,
+      "help": "Filled in automatically from the redirect URL (OAuth2)",
+      "onChange": {
+        "alsoDependsOn": ["authCode"],
+        "calculateFunc": "((data.authCode || '').match(/[?&]site_?id=([^&#\\s]+)/i) || [])[1] || data.siteid",
+        "ignoreOwnChanges": true
+      }
     },
     "currentPowerFlow": {
       "newLine": true,

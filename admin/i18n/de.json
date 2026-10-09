@@ -1,5 +1,5 @@
 {
-    "instructions": "Geben Sie unten die Site-ID Ihres Wechselrichters und die Zugangsdaten für die SolarEdge Monitoring API v2 ein. API-Aufrufe verbrauchen Credits Ihrer SolarEdge-App (kostenlos: 2000 Credits/Monat), stellen Sie die Planung also nicht zu niedrig ein. Die Daten werden auf der SolarEdge-Seite nur alle 15 Minuten aktualisiert.",
+    "instructions": "Geben Sie unten die Zugangsdaten für die SolarEdge Monitoring API v2 ein. Bei OAuth2 wird die Site-ID aus der Redirect-URL übernommen, bei einem API-Key bitte manuell eintragen. API-Aufrufe verbrauchen Credits Ihrer SolarEdge-App (kostenlos: 2000 Credits/Monat), stellen Sie die Planung also nicht zu niedrig ein. Die Daten werden auf der SolarEdge-Seite nur alle 15 Minuten aktualisiert.",
     "Site ID": "Site ID",
     "API key": "API-Schlüssel",
     "Read current power flow": "Aktuellen Leistungsfluss ablesen",
@@ -19,5 +19,6 @@
     "Authorization link": "Autorisierungslink",
     "Copy and open this link in your browser": "Diesen Link kopieren und im Browser öffnen",
     "Authorization code or redirect URL": "Autorisierungscode oder Redirect-URL",
-    "Paste the complete URL from the browser address bar after granting access, then save": "Nach dem Gewähren des Zugriffs die komplette URL aus der Adresszeile einfügen und speichern"
+    "Paste the complete URL from the browser address bar after granting access, then save": "Nach dem Gewähren des Zugriffs die komplette URL aus der Adresszeile einfügen und speichern",
+    "Filled in automatically from the redirect URL (OAuth2)": "Wird bei OAuth2 automatisch aus der Redirect-URL übernommen"
 }
