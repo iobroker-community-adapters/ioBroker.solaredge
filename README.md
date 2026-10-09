@@ -44,7 +44,9 @@ v1 api keys do not work with v2.
 1. Create an account at the [SolarEdge developer portal](https://developer.solaredge.com/) and create a
    Site Access application with scope `SITE_DATA`.
    As redirect URI enter the value shown in the instance settings (default `https://localhost/`).
-   The redirect target does not need to exist.
+   The redirect target does not need to exist. Tip: use the address of your ioBroker admin
+   (e.g. `http://192.168.1.10:8081/`), then the browser opens admin after granting access
+   instead of an error page. The redirect URI in the app and in the instance settings must be identical.
 2. Enter client id and client secret of the application in the instance settings and save.
 3. Copy the authorization link shown in the instance settings, open it in your browser, log in and grant access.
 4. The browser is redirected to the redirect URI (the page may fail to load). Copy the complete URL from the
