@@ -85,6 +85,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 - (mcm1957) BREAKING: The `currentPowerFlow` feature now requires a Business Pro or Enterprise tier subscription at SolarEdge.
 - (Garfonso) OAuth2 Site Access (client id/secret of your own SolarEdge app) has been added, Fleet Access API key is optional. See README for setup.
 - (Garfonso) Time ranges are now sent in local time and API units are converted correctly.
+- (Garfonso) Power flow reads the v2 response; new states for battery power, charge level and grid/battery status.
 - (Garfonso) API calls reduced to about 1 per run and 2 per day, no calls at night. Default schedule is every 30 minutes now, existing instances with every 15 minutes are changed once.
 - (copilot) Adapter requires node.js >= 22 now
 - (iobroker-bot) Adapter requires node.js >= 20 now.

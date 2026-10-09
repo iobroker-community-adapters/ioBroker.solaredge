@@ -12,7 +12,7 @@
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
 const { SolarEdgeAuth, AuthError, describeError, extractSiteId } = require('./lib/auth');
-const { formatDate, convertToWh } = require('./lib/helpers');
+const { formatDate, convertToWh, parsePowerFlow } = require('./lib/helpers');
 const { dayKey, startOfDay, quarterWindowStart, mergeQuarters, sumQuarters, currentPower, monthAndYear, isDaylight } = require('./lib/energy');
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -241,33 +241,42 @@ async function main() {
                 desc: 'last day energy in Wh'
             });
         }
-        if (adapter.config.currentPowerFlow && !(await adapter.getObjectAsync(`${siteid}.currentFlowGrid`))) {
-            await createState('currentFlowGrid', {
-                name: 'Current flow: Grid',
-                type: 'number',
+        if (adapter.config.currentPowerFlow && !(await adapter.getObjectAsync(`${siteid}.currentFlowStorageLevel`))) {
+            const flowStates = {
+                currentFlowGrid: ['Current flow: Grid', 'value.power', 'Current import from or export to the grid'],
+                currentFlowLoad: ['Current flow: Load', 'value.power.consumed', 'Current total usage'],
+                currentFlowPv: ['Current flow: PV', 'value.power.produced', 'Current production from PV'],
+                currentFlowStorage: ['Current flow: Storage', 'value.power', 'Current charge or discharge power of the battery'],
+            };
+            for (const [id, [name, role, desc]] of Object.entries(flowStates)) {
+                await createState(id, { name, type: 'number', read: true, write: false, unit: 'kW', role, desc });
+            }
+            await createState('currentFlowGridStatus', {
+                name: 'Current flow: Grid status',
+                type: 'string',
                 read: true,
                 write: false,
-                unit: 'kW',
-                role: 'value.power.consumed',
-                desc: 'Current usage from energy grid'
+                role: 'text',
+                states: { IMPORT: 'IMPORT', EXPORT: 'EXPORT', IDLE: 'IDLE', GRID_OUTAGE: 'GRID_OUTAGE' },
+                desc: 'IMPORT, EXPORT, IDLE or GRID_OUTAGE',
             });
-            await createState('currentFlowLoad', {
-                name: 'Current flow: Load',
-                type: 'number',
+            await createState('currentFlowStorageStatus', {
+                name: 'Current flow: Storage status',
+                type: 'string',
                 read: true,
                 write: false,
-                unit: 'kW',
-                role: 'value.power.consumed',
-                desc: 'Current total usage'
+                role: 'text',
+                states: { CHARGE: 'CHARGE', DISCHARGE: 'DISCHARGE', IDLE: 'IDLE' },
+                desc: 'CHARGE, DISCHARGE or IDLE',
             });
-            await createState('currentFlowPv', {
-                name: 'Current flow: PV',
+            await createState('currentFlowStorageLevel', {
+                name: 'Current flow: Storage charge level',
                 type: 'number',
                 read: true,
                 write: false,
-                unit: 'kW',
-                role: 'value.power.produced',
-                desc: 'Current production from PV'
+                unit: '%',
+                role: 'value.battery',
+                desc: 'Current battery charge level',
             });
         }
 
@@ -335,13 +344,15 @@ async function main() {
         if (adapter.config.currentPowerFlow && daylight && !authFailed) {
             try {
                 const powerFlowResp = await apiGet(auth, `${baseUrl}/power-flow`);
-                if (powerFlowResp.data) {
-                    const powerFlow = powerFlowResp.data.siteCurrentPowerFlow;
-                    if (powerFlow) {
-                        await adapter.setStateChangedAsync(`${siteid}.currentFlowGrid`, powerFlow.GRID ? powerFlow.GRID.currentPower : 0, true);
-                        await adapter.setStateChangedAsync(`${siteid}.currentFlowLoad`, powerFlow.LOAD ? powerFlow.LOAD.currentPower : 0, true);
-                        await adapter.setStateChangedAsync(`${siteid}.currentFlowPv`, powerFlow.PV ? powerFlow.PV.currentPower : 0, true);
-                    }
+                const flow = parsePowerFlow(powerFlowResp.data);
+                if (flow) {
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowGrid`, flow.grid, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowLoad`, flow.load, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowPv`, flow.pv, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowStorage`, flow.storage, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowGridStatus`, flow.gridStatus, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowStorageStatus`, flow.storageStatus, true);
+                    await adapter.setStateChangedAsync(`${siteid}.currentFlowStorageLevel`, flow.storageLevel, true);
                 }
             } catch (error) {
                 if (error.response && error.response.status === 403) {
