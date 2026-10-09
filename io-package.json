@@ -143,7 +143,7 @@
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.solaredge/blob/master/README.md",
     "loglevel": "info",
     "mode": "schedule",
-    "schedule": "*/15 * * * *",
+    "schedule": "*/30 * * * *",
     "type": "energy",
     "compact": true,
     "connectionType": "cloud",
@@ -175,7 +175,8 @@
     "currentPowerFlow": false,
     "retrieveLastDayData": true,
     "retrieveLastMonthData": true,
-    "retrieveLastYearData": true
+    "retrieveLastYearData": true,
+    "pauseAtNight": true
   },
   "encryptedNative": [
     "apikey",
@@ -203,6 +204,32 @@
         "name": "OAuth2 tokens (encrypted)",
         "type": "string",
         "role": "text",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.energyToday",
+      "type": "state",
+      "common": {
+        "name": "Today's quarter hour energy (internal)",
+        "type": "string",
+        "role": "json",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.energyBase",
+      "type": "state",
+      "common": {
+        "name": "Month, year and lifetime energy until midnight (internal)",
+        "type": "string",
+        "role": "json",
         "read": true,
         "write": false,
         "def": ""

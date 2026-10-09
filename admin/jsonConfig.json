@@ -113,6 +113,15 @@
         "ignoreOwnChanges": true
       }
     },
+    "pauseAtNight": {
+      "newLine": true,
+      "type": "checkbox",
+      "label": "No API calls at night",
+      "help": "Uses the location from the system settings. Saves API credits",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
     "currentPowerFlow": {
       "newLine": true,
       "type": "checkbox",

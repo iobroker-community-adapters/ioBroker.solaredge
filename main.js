@@ -12,7 +12,8 @@
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
 const { SolarEdgeAuth, AuthError, describeError, extractSiteId } = require('./lib/auth');
-const { formatDate, convertToWh, convertToW, getLastEntry, getLastNonNull, sumNonNull } = require('./lib/helpers');
+const { formatDate, convertToWh } = require('./lib/helpers');
+const { dayKey, startOfDay, quarterWindowStart, mergeQuarters, sumQuarters, currentPower, monthAndYear, isDaylight } = require('./lib/energy');
 const adapterName = require('./package.json').name.split('.').pop();
 
 /**
@@ -21,6 +22,11 @@ const adapterName = require('./package.json').name.split('.').pop();
  */
 let adapter;
 let siteid;
+
+// today's quarter hour energy values, kept between the scheduled runs
+const CACHE_STATE = 'info.energyToday';
+// month, year and lifetime energy until midnight
+const BASE_STATE = 'info.energyBase';
 
 /**
  * Starts the adapter instance
@@ -72,6 +78,72 @@ async function apiGet(auth, url) {
  */
 async function createState(name, common) {
     await adapter.setObjectNotExistsAsync(`${siteid}.${name}`, { type: 'state', common, native: {} });
+}
+
+/**
+ * @param {string} id
+ * @returns {Promise<any>} parsed JSON value of the state, null if not set or invalid
+ */
+async function readJsonState(id) {
+    try {
+        const state = await adapter.getStateAsync(id);
+        return state && state.val ? JSON.parse(String(state.val)) : null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * @param {string} id
+ * @param {any} value
+ */
+async function writeJsonState(id, value) {
+    await adapter.setStateAsync(id, JSON.stringify(value), true);
+}
+
+/**
+ * @returns {Promise<[number|undefined, number|undefined]>} latitude and longitude from the system settings
+ */
+async function getLocation() {
+    try {
+        const config = await adapter.getForeignObjectAsync('system.config');
+        const latitude = parseFloat(config && config.common && config.common.latitude);
+        const longitude = parseFloat(config && config.common && config.common.longitude);
+        if (!isNaN(latitude) && !isNaN(longitude)) {
+            return [latitude, longitude];
+        }
+    } catch {
+        // ignore, handled below
+    }
+    adapter.log.debug('No location set in the system settings, querying the API at night, too');
+    return [undefined, undefined];
+}
+
+/**
+ * Fetches month, year and lifetime energy until midnight.
+ * @param {SolarEdgeAuth} auth
+ * @param {string} baseUrl
+ * @param {Date} now
+ * @param {number} todayEnergy today's energy in Wh, subtracted from the lifetime counter
+ * @returns {Promise<{date: string, month: number, year: number, lifetime: number|null}>}
+ */
+async function fetchBase(auth, baseUrl, now, todayEnergy) {
+    const midnight = startOfDay(now);
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    // on January 1st there is nothing to fetch yet
+    const monthResp = midnight > startOfYear
+        ? await apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'MONTH', unit: 'WH', from: startOfYear, to: midnight })}`)
+        : null;
+    const { month, year } = monthAndYear(monthResp && monthResp.data, now);
+
+    let lifetime = null;
+    if (adapter.config.retrieveLastYearData) {
+        const lifetimeResp = await apiGet(auth, `${baseUrl}/lifetime-energy`);
+        if (lifetimeResp.data && typeof lifetimeResp.data.energy === 'number') {
+            lifetime = convertToWh(lifetimeResp.data.energy, lifetimeResp.data.unit) - todayEnergy;
+        }
+    }
+    return { date: dayKey(now), month, year, lifetime };
 }
 
 async function main() {
@@ -200,80 +272,67 @@ async function main() {
         }
 
         let authFailed = false;
-        try {
-            const now = new Date();
-            const oneHourAgo = new Date(now - 3600000);
-            const startOfYear = new Date(now.getFullYear(), 0, 1);
+        const now = new Date();
+        const today = dayKey(now);
+        // instances from before the option existed have no value: pause by default
+        const daylight = adapter.config.pauseAtNight === false || isDaylight(now, ...(await getLocation()));
 
-            // Energy totals change slowly: YEAR (lifeTimeData + lastYearData) once per day,
-            // MONTH (lastMonthData) once per hour. Check state ts to decide whether to fetch.
-            // setStateAsync is used for these states (not setStateChangedAsync) so ts always
-            // reflects the last fetch time, not only the last value change.
-            const [lifetimeState, monthState] = await Promise.all([
-                adapter.config.retrieveLastYearData ? adapter.getStateAsync(`${siteid}.lifeTimeData`) : null,
-                adapter.config.retrieveLastMonthData ? adapter.getStateAsync(`${siteid}.lastMonthData`) : null,
-            ]);
-            const fetchYearEnergy = adapter.config.retrieveLastYearData && (
-                !lifetimeState || !lifetimeState.ts ||
-                (now.getTime() - lifetimeState.ts) >= 24 * 60 * 60 * 1000
-            );
-            const fetchMonthEnergy = adapter.config.retrieveLastMonthData && (
-                !monthState || !monthState.ts ||
-                (now.getTime() - monthState.ts) >= 60 * 60 * 1000
-            );
-
-            adapter.log.debug(`fetchYearEnergy: ${fetchYearEnergy}, fetchMonthEnergy: ${fetchMonthEnergy}`);
-
-            // Fetch live data every cycle; energy and overview calls are conditional on config
-            const [overviewResp, powerResp, yearEnergyResp, monthEnergyResp] = await Promise.all([
-                adapter.config.retrieveLastDayData ? apiGet(auth, `${baseUrl}/overview`) : null,
-                apiGet(auth, `${baseUrl}/power?${query({ resolution: 'QUARTER_HOUR', unit: 'W', from: oneHourAgo, to: now })}`),
-                fetchYearEnergy ? apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'YEAR', unit: 'WH', from: new Date(2000, 0, 1), to: now })}`) : null,
-                fetchMonthEnergy ? apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'MONTH', unit: 'WH', from: startOfYear, to: now })}`) : null,
-            ]);
-
-            const powerValues = (powerResp.data && powerResp.data.values) || [];
-
-            // Derive lastUpdateTime from the last power value timestamp (avoids a separate site-details call)
-            const lastPowerEntry = getLastEntry(powerValues);
-            const lastUpdateTime = lastPowerEntry ? lastPowerEntry.date || lastPowerEntry.timestamp : null;
-
-            const currentPower = convertToW(lastPowerEntry ? lastPowerEntry.value : 0, powerResp.data && powerResp.data.unit);
-
-            adapter.log.debug(`Current power for ${siteid}: ${currentPower} W`);
-            adapter.log.debug('updating states');
-
-            await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, lastUpdateTime, true);
-            await adapter.setStateChangedAsync(`${siteid}.currentPower`, currentPower, true);
-
-            if (overviewResp) {
-                const overview = overviewResp.data;
-                const lastDayData = convertToWh(
-                    overview.production ? overview.production.total : 0,
-                    overview.production ? overview.production.unit : 'Wh'
-                );
-                await adapter.setStateChangedAsync(`${siteid}.lastDayData`, lastDayData, true);
+        if (!daylight) {
+            // no production at night: save the credits
+            adapter.log.debug('Night, no API calls');
+            await adapter.setStateChangedAsync(`${siteid}.currentPower`, 0, true);
+            const cache = await readJsonState(CACHE_STATE);
+            if (adapter.config.retrieveLastDayData && (!cache || cache.date !== today)) {
+                await adapter.setStateChangedAsync(`${siteid}.lastDayData`, 0, true);
             }
-            if (yearEnergyResp) {
-                const yearValues = (yearEnergyResp.data && yearEnergyResp.data.values) || [];
-                const yearUnit = yearEnergyResp.data && yearEnergyResp.data.unit;
-                await adapter.setStateAsync(`${siteid}.lifeTimeData`, convertToWh(sumNonNull(yearValues), yearUnit), true);
-                await adapter.setStateAsync(`${siteid}.lastYearData`, convertToWh(getLastNonNull(yearValues), yearUnit), true);
-            }
-            if (monthEnergyResp) {
-                const monthValues = (monthEnergyResp.data && monthEnergyResp.data.values) || [];
-                await adapter.setStateAsync(`${siteid}.lastMonthData`, convertToWh(getLastNonNull(monthValues), monthEnergyResp.data && monthEnergyResp.data.unit), true);
-            }
-        } catch (error) {
-            if (error instanceof AuthError) {
-                authFailed = true;
-                adapter.log.error(error.message);
-            } else {
-                adapter.log.error(`Cannot read data from solaredge cloud: ${describeError(error)}`);
+        } else {
+            try {
+                // one call per run: today's quarter hour energy, gives today's energy and the current power
+                const energyResp = await apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'QUARTER_HOUR', unit: 'WH', from: quarterWindowStart(now), to: now })}`);
+                const cache = mergeQuarters(await readJsonState(CACHE_STATE), energyResp.data, now);
+                await writeJsonState(CACHE_STATE, cache);
+                const todayEnergy = sumQuarters(cache);
+                const power = currentPower(cache, now);
+
+                adapter.log.debug(`Current power for ${siteid}: ${power.power} W, today: ${todayEnergy} Wh`);
+                adapter.log.debug('updating states');
+
+                if (power.timestamp !== null) {
+                    await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, formatDate(new Date(power.timestamp)), true);
+                }
+                await adapter.setStateChangedAsync(`${siteid}.currentPower`, power.power, true);
+                if (adapter.config.retrieveLastDayData) {
+                    await adapter.setStateChangedAsync(`${siteid}.lastDayData`, todayEnergy, true);
+                }
+
+                // month, year and lifetime until midnight are fetched once per day; today's energy is added
+                if (adapter.config.retrieveLastMonthData || adapter.config.retrieveLastYearData) {
+                    let base = await readJsonState(BASE_STATE);
+                    if (!base || base.date !== today) {
+                        base = await fetchBase(auth, baseUrl, now, todayEnergy);
+                        await writeJsonState(BASE_STATE, base);
+                    }
+                    if (adapter.config.retrieveLastMonthData) {
+                        await adapter.setStateChangedAsync(`${siteid}.lastMonthData`, base.month + todayEnergy, true);
+                    }
+                    if (adapter.config.retrieveLastYearData) {
+                        await adapter.setStateChangedAsync(`${siteid}.lastYearData`, base.year + todayEnergy, true);
+                        if (typeof base.lifetime === 'number') {
+                            await adapter.setStateChangedAsync(`${siteid}.lifeTimeData`, base.lifetime + todayEnergy, true);
+                        }
+                    }
+                }
+            } catch (error) {
+                if (error instanceof AuthError) {
+                    authFailed = true;
+                    adapter.log.error(error.message);
+                } else {
+                    adapter.log.error(`Cannot read data from solaredge cloud: ${describeError(error)}`);
+                }
             }
         }
 
-        if (adapter.config.currentPowerFlow && !authFailed) {
+        if (adapter.config.currentPowerFlow && daylight && !authFailed) {
             try {
                 const powerFlowResp = await apiGet(auth, `${baseUrl}/power-flow`);
                 if (powerFlowResp.data) {
@@ -300,8 +359,17 @@ async function main() {
         try {
             const instObj = await adapter.getForeignObjectAsync(`system.adapter.${adapter.namespace}`);
             let changed = false;
-            if (instObj && instObj.common && instObj.common.schedule && instObj.common.schedule === '*/15 * * * *') {
-                instObj.common.schedule = `${Math.floor(Math.random() * 60)} */15 * * * *`;
+            // the old default (every 15 minutes) needs more credits than the free tier has; changed once only
+            if (instObj && !instObj.native.scheduleMigrated) {
+                if (/^(\d+ )?\*\/15 \* \* \* \*$/.test(instObj.common.schedule || '')) {
+                    instObj.common.schedule = '*/30 * * * *';
+                    adapter.log.info('Schedule changed from every 15 to every 30 minutes to stay within the free API credits');
+                }
+                instObj.native.scheduleMigrated = true;
+                changed = true;
+            }
+            if (instObj && instObj.common && instObj.common.schedule === '*/30 * * * *') {
+                instObj.common.schedule = `${Math.floor(Math.random() * 60)} */30 * * * *`;
                 adapter.log.info(`Default schedule found and adjusted to spread calls better over the minute`);
                 changed = true;
             }

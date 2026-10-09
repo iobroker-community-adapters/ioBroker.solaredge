@@ -20,5 +20,7 @@
     "Copy and open this link in your browser": "Copy and open this link in your browser",
     "Authorization code or redirect URL": "Authorization code or redirect URL",
     "Paste the complete URL from the browser address bar after granting access, then save": "Paste the complete URL from the browser address bar after granting access, then save",
-    "Filled in automatically from the redirect URL (OAuth2)": "Filled in automatically from the redirect URL (OAuth2)"
+    "Filled in automatically from the redirect URL (OAuth2)": "Filled in automatically from the redirect URL (OAuth2)",
+    "No API calls at night": "No API calls at night",
+    "Uses the location from the system settings. Saves API credits": "Uses the location from the system settings. Saves API credits"
 }

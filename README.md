@@ -59,10 +59,17 @@ repeat steps 3 and 4.
 
 **Fleet Access (API key, installers):** select access type "Fleet Access" and enter the App API key.
 
-**Credits:** each API call consumes credits of your SolarEdge app (free tier: 2000 credits/month).
-With the default schedule (every 15 minutes) the adapter needs about 2 calls per run,
-plus one call per hour for month and one per day for year energy.
-Disable the energy values you don't need or increase the schedule interval if you run out of credits.
+**Credits:** each API call consumes 1 credit of your SolarEdge developer account
+(free tier: 2000 credits/month, shared by all apps of the account). The adapter is built to stay well below that:
+- Default schedule every 30 minutes. Instances with the old default (every 15 minutes) are changed once on update.
+- 1 call per run: today's energy in quarter hours, which gives today's energy and the current power
+  (average of the last complete quarter hour).
+- 2 calls per day for month, year and lifetime energy until midnight; today's energy is added to them.
+- No calls at night (option "No API calls at night", uses the location from the system settings):
+  from 30 minutes before sunrise until 1 hour after sunset.
+
+That's about 1200 calls/month in summer (Germany) and fewer in winter. A schedule of every 15 minutes needs
+about 2300 calls/month in summer, more than the free tier allows. "Read current power flow" adds 1 call per run and needs a paid tier.
 
 ## Credits
 
@@ -78,6 +85,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 - (mcm1957) BREAKING: The `currentPowerFlow` feature now requires a Business Pro or Enterprise tier subscription at SolarEdge.
 - (Garfonso) OAuth2 Site Access (client id/secret of your own SolarEdge app) has been added, Fleet Access API key is optional. See README for setup.
 - (Garfonso) Time ranges are now sent in local time and API units are converted correctly.
+- (Garfonso) API calls reduced to about 1 per run and 2 per day, no calls at night. Default schedule is every 30 minutes now, existing instances with every 15 minutes are changed once.
 - (copilot) Adapter requires node.js >= 22 now
 - (iobroker-bot) Adapter requires node.js >= 20 now.
 - (copilot) Adapter requires admin >= 7.7.22 now
