@@ -35,6 +35,15 @@ function startAdapter(options) {
 }
 
 /**
+ * Builds a query string; dates are formatted as local time with offset.
+ * @param {Record<string, string|Date>} params
+ */
+function query(params) {
+    const entries = Object.entries(params).map(([key, value]) => [key, value instanceof Date ? formatDate(value) : value]);
+    return new URLSearchParams(entries).toString();
+}
+
+/**
  * GET request against the v2 API. Retries once with a fresh access token on 401.
  * @param {SolarEdgeAuth} auth
  * @param {string} url
@@ -214,9 +223,9 @@ async function main() {
             // Fetch live data every cycle; energy and overview calls are conditional on config
             const [overviewResp, powerResp, yearEnergyResp, monthEnergyResp] = await Promise.all([
                 adapter.config.retrieveLastDayData ? apiGet(auth, `${baseUrl}/overview`) : null,
-                apiGet(auth, `${baseUrl}/power?resolution=QUARTER_HOUR&unit=W&from=${formatDate(oneHourAgo)}&to=${formatDate(now)}`),
-                fetchYearEnergy ? apiGet(auth, `${baseUrl}/energy?resolution=YEAR&unit=WH&from=2000-01-01T00:00:00&to=${formatDate(now)}`) : null,
-                fetchMonthEnergy ? apiGet(auth, `${baseUrl}/energy?resolution=MONTH&unit=WH&from=${formatDate(startOfYear)}&to=${formatDate(now)}`) : null,
+                apiGet(auth, `${baseUrl}/power?${query({ resolution: 'QUARTER_HOUR', unit: 'W', from: oneHourAgo, to: now })}`),
+                fetchYearEnergy ? apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'YEAR', unit: 'WH', from: new Date(2000, 0, 1), to: now })}`) : null,
+                fetchMonthEnergy ? apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'MONTH', unit: 'WH', from: startOfYear, to: now })}`) : null,
             ]);
 
             const powerValues = (powerResp.data && powerResp.data.values) || [];
