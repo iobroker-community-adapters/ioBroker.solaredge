@@ -52,6 +52,15 @@ async function apiGet(auth, url) {
     }
 }
 
+/**
+ * Creates the state `<siteid>.<name>` if it does not exist yet.
+ * @param {string} name
+ * @param {ioBroker.StateCommon} common
+ */
+async function createState(name, common) {
+    await adapter.setObjectNotExistsAsync(`${siteid}.${name}`, { type: 'state', common, native: {} });
+}
+
 async function main() {
     const apikey = adapter.config.authType === 'apikey' ? adapter.config.apikey : '';
     const { clientId, clientSecret } = adapter.config;
@@ -86,7 +95,8 @@ async function main() {
         // create state objects only on first run; they persist across scheduled restarts
         if (!(await adapter.getObjectAsync(`${siteid}.currentPower`))) {
             adapter.log.debug('creating states');
-            await adapter.createStateNotExists('', siteid, 'lastUpdateTime', {
+            await adapter.setObjectNotExistsAsync(siteid, { type: 'channel', common: { name: `Site ${siteid}` }, native: {} });
+            await createState('lastUpdateTime', {
                 name: 'lastUpdateTime',
                 type: 'string',
                 role: 'date',
@@ -94,7 +104,7 @@ async function main() {
                 write: false,
                 desc: 'Last update from inverter'
             });
-            await adapter.createStateNotExists('', siteid, 'currentPower', {
+            await createState('currentPower', {
                 name: 'currentPower',
                 type: 'number',
                 read: true,
@@ -105,7 +115,7 @@ async function main() {
             });
         }
         if (adapter.config.retrieveLastYearData && !(await adapter.getObjectAsync(`${siteid}.lifeTimeData`))) {
-            await adapter.createStateNotExists('', siteid, 'lifeTimeData', {
+            await createState('lifeTimeData', {
                 name: 'lifeTimeData',
                 type: 'number',
                 read: true,
@@ -114,7 +124,7 @@ async function main() {
                 unit: 'Wh',
                 desc: 'Lifetime energy in Wh'
             });
-            await adapter.createStateNotExists('', siteid, 'lastYearData', {
+            await createState('lastYearData', {
                 name: 'lastYearData',
                 type: 'number',
                 read: true,
@@ -125,7 +135,7 @@ async function main() {
             });
         }
         if (adapter.config.retrieveLastMonthData && !(await adapter.getObjectAsync(`${siteid}.lastMonthData`))) {
-            await adapter.createStateNotExists('', siteid, 'lastMonthData', {
+            await createState('lastMonthData', {
                 name: 'lastMonthData',
                 type: 'number',
                 read: true,
@@ -136,7 +146,7 @@ async function main() {
             });
         }
         if (adapter.config.retrieveLastDayData && !(await adapter.getObjectAsync(`${siteid}.lastDayData`))) {
-            await adapter.createStateNotExists('', siteid, 'lastDayData', {
+            await createState('lastDayData', {
                 name: 'lastDayData',
                 type: 'number',
                 read: true,
@@ -147,7 +157,7 @@ async function main() {
             });
         }
         if (adapter.config.currentPowerFlow && !(await adapter.getObjectAsync(`${siteid}.currentFlowGrid`))) {
-            await adapter.createStateNotExists('', siteid, 'currentFlowGrid', {
+            await createState('currentFlowGrid', {
                 name: 'Current flow: Grid',
                 type: 'number',
                 read: true,
@@ -156,7 +166,7 @@ async function main() {
                 role: 'value.power.consumed',
                 desc: 'Current usage from energy grid'
             });
-            await adapter.createStateNotExists('', siteid, 'currentFlowLoad', {
+            await createState('currentFlowLoad', {
                 name: 'Current flow: Load',
                 type: 'number',
                 read: true,
@@ -165,7 +175,7 @@ async function main() {
                 role: 'value.power.consumed',
                 desc: 'Current total usage'
             });
-            await adapter.createStateNotExists('', siteid, 'currentFlowPv', {
+            await createState('currentFlowPv', {
                 name: 'Current flow: PV',
                 type: 'number',
                 read: true,
