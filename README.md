@@ -29,7 +29,8 @@ For more details and for information how to disable the error reporting see [Sen
 
 Get data from the SolarEdge monitoring portal via the SolarEdge Monitoring API v2.
 The adapter reads current power and day/month/year/lifetime energy, optionally the current power flow
-(power flow requires an Advanced Monitoring tier at SolarEdge).
+(SolarEdge documents power flow for paid tiers only; with OAuth2 Site Access it currently also works on the free tier,
+but this may change).
 
 You can also enable modbus on your solaredge device if it's a newer one and read the data directly.
 
@@ -69,7 +70,8 @@ repeat steps 3 and 4.
   from 30 minutes before sunrise until 1 hour after sunset.
 
 That's about 1200 calls/month in summer (Germany) and fewer in winter. A schedule of every 15 minutes needs
-about 2300 calls/month in summer, more than the free tier allows. "Read current power flow" adds 1 call per run and needs a paid tier.
+about 2300 calls/month in summer, more than the free tier allows. "Read current power flow" adds 1 call per run (about 2400 calls/month in summer with every 30 minutes),
+so with power flow on the free tier use a schedule of every hour.
 
 ## Credits
 
@@ -85,7 +87,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 - (mcm1957) BREAKING: The `currentPowerFlow` feature now requires a Business Pro or Enterprise tier subscription at SolarEdge.
 - (Garfonso) OAuth2 Site Access (client id/secret of your own SolarEdge app) has been added, Fleet Access API key is optional. See README for setup.
 - (Garfonso) Time ranges are now sent in local time and API units are converted correctly.
-- (Garfonso) Power flow reads the v2 response; new states for battery power, charge level and grid/battery status.
+- (Garfonso) Power flow reads the v2 response; new states for battery power, charge level and grid/battery status. Power flow currently also works on the free tier with OAuth2 Site Access.
 - (Garfonso) API calls reduced to about 1 per run and 2 per day, no calls at night. Default schedule is every 30 minutes now, existing instances with every 15 minutes are changed once.
 - (copilot) Adapter requires node.js >= 22 now
 - (copilot) Adapter requires admin >= 7.7.22 now
