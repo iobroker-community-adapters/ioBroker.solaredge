@@ -93,19 +93,6 @@
         "pl": "Wprowadzono aktualne dane przepływu prądu",
         "uk": "Додано дані поточного потоку живлення",
         "zh-cn": "增加目前的电力流通数据"
-      },
-      "1.0.1": {
-        "en": "Added JSON config and replaced `require` module with `axios`",
-        "de": "Hinzugefügt JSON config und ersetzt erfordern Modul mit Axios",
-        "ru": "Добавлен JSON config и заменен требуют модуля с axios",
-        "pt": "Adicionado JSON config e substituído exigem módulo com axios",
-        "nl": "JSON config toegevoegd en vervangen vereisen module met axios",
-        "fr": "Ajout de la configuration JSON et remplacement du module requis avec axios",
-        "it": "Aggiunto JSON config e sostituito richiedono modulo con assios",
-        "es": "Configuración JSON agregada y remplazado requiere módulo con eje",
-        "pl": "Zastąpiła konfigura JSON i zastąpiona została modułem axios",
-        "uk": "Додано налаштування JSON і заміну потрібно модуль з axios",
-        "zh-cn": "增加联合联络中心,并更换了连接点的单元。"
       }
     },
     "messages": [
