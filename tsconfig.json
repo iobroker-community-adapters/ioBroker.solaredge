@@ -1,5 +1,6 @@
 // Root tsconfig to set the settings and power editor support for all TS files
 {
+    "extends": "@tsconfig/node22/tsconfig.json",
     "compileOnSave": true,
     "compilerOptions": {
         // do not compile anything, this file is just to configure type checking
@@ -11,18 +12,12 @@
 
         "module": "commonjs",
         "moduleResolution": "node",
-        "esModuleInterop": true,
         // this is necessary for the automatic typing of the adapter config
         "resolveJsonModule": true,
 
-        // Set this to false if you want to disable the very strict rules (not recommended)
-        "strict": true,
         "noImplicitAny": false,
         "useUnknownInCatchVariables": false,
-        "skipLibCheck": true,
 
-        "target": "es2022",
-        "lib": ["es2022"],
         "types": ["node", "mocha"]
     },
     "include": ["**/*.js", "**/*.d.ts"],
