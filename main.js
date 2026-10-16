@@ -39,9 +39,19 @@ const CACHE_STATE = 'info.energyToday';
 const BASE_STATE = 'info.energyBase';
 
 /**
+ * @typedef {object} BaseValues month, year and lifetime energy until midnight in Wh
+ * @property {string} date day the values were fetched (local date)
+ * @property {number} month energy of this month
+ * @property {number} year energy of this year
+ * @property {number|null} lifetime lifetime energy, null if not available
+ */
+
+/** @typedef {{date: string, quarters: Record<string, number>}} QuarterCache today's quarter hour energy */
+
+/**
  * Starts the adapter instance
  *
- * @param {Partial<utils.AdapterOptions>} [options]
+ * @param {Partial<utils.AdapterOptions>} [options] options from js-controller
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
@@ -55,7 +65,8 @@ function startAdapter(options) {
 /**
  * Builds a query string; dates are formatted as local time with offset.
  *
- * @param {Record<string, string|Date>} params
+ * @param {Record<string, string|Date>} params query parameters
+ * @returns {string} URL encoded query string
  */
 function query(params) {
     const search = new URLSearchParams();
@@ -68,8 +79,9 @@ function query(params) {
 /**
  * GET request against the v2 API. Retries once with a fresh access token on 401.
  *
- * @param {SolarEdgeAuth} auth
- * @param {string} url
+ * @param {SolarEdgeAuth} auth provides the auth header
+ * @param {string} url request URL
+ * @returns {Promise<import('axios').AxiosResponse>} response
  */
 async function apiGet(auth, url) {
     const request = async () => {
@@ -91,16 +103,16 @@ async function apiGet(auth, url) {
 /**
  * Creates the state `<siteid>.<name>` if it does not exist yet.
  *
- * @param {string} name
- * @param {ioBroker.StateCommon} common
+ * @param {string} name state name below the site channel
+ * @param {ioBroker.StateCommon} common common part of the state object
  */
 async function createState(name, common) {
     await adapter.setObjectNotExistsAsync(`${siteid}.${name}`, { type: 'state', common, native: {} });
 }
 
 /**
- * @param {string} id
- * @returns {Promise<any>} parsed JSON value of the state, null if not set or invalid
+ * @param {string} id state id
+ * @returns {Promise<unknown>} parsed JSON value of the state, null if not set or invalid
  */
 async function readJsonState(id) {
     try {
@@ -112,8 +124,8 @@ async function readJsonState(id) {
 }
 
 /**
- * @param {string} id
- * @param {any} value
+ * @param {string} id state id
+ * @param {object} value value to store as JSON
  */
 async function writeJsonState(id, value) {
     await adapter.setStateAsync(id, JSON.stringify(value), true);
@@ -140,11 +152,11 @@ async function getLocation() {
 /**
  * Fetches month, year and lifetime energy until midnight.
  *
- * @param {SolarEdgeAuth} auth
- * @param {string} baseUrl
- * @param {Date} now
+ * @param {SolarEdgeAuth} auth provides the auth header
+ * @param {string} baseUrl API URL of the site
+ * @param {Date} now current time
  * @param {number} todayEnergy today's energy in Wh, subtracted from the lifetime counter
- * @returns {Promise<{date: string, month: number, year: number, lifetime: number|null}>}
+ * @returns {Promise<BaseValues>} energy until midnight in Wh
  */
 async function fetchBase(auth, baseUrl, now, todayEnergy) {
     const midnight = startOfDay(now);
@@ -323,7 +335,7 @@ async function main() {
             // no production at night: save the credits
             adapter.log.debug('Night, no API calls');
             await adapter.setStateChangedAsync(`${siteid}.currentPower`, 0, true);
-            const cache = await readJsonState(CACHE_STATE);
+            const cache = /** @type {QuarterCache|null} */ (await readJsonState(CACHE_STATE));
             if (adapter.config.retrieveLastDayData && (!cache || cache.date !== today)) {
                 await adapter.setStateChangedAsync(`${siteid}.lastDayData`, 0, true);
             }
@@ -334,7 +346,11 @@ async function main() {
                     auth,
                     `${baseUrl}/energy?${query({ resolution: 'QUARTER_HOUR', unit: 'WH', from: quarterWindowStart(now), to: now })}`,
                 );
-                const cache = mergeQuarters(await readJsonState(CACHE_STATE), energyResp.data, now);
+                const cache = mergeQuarters(
+                    /** @type {QuarterCache|null} */ (await readJsonState(CACHE_STATE)),
+                    energyResp.data,
+                    now,
+                );
                 await writeJsonState(CACHE_STATE, cache);
                 const todayEnergy = sumQuarters(cache);
                 const power = currentPower(cache, now);
@@ -356,7 +372,7 @@ async function main() {
 
                 // month, year and lifetime until midnight are fetched once per day; today's energy is added
                 if (adapter.config.retrieveLastMonthData || adapter.config.retrieveLastYearData) {
-                    let base = await readJsonState(BASE_STATE);
+                    let base = /** @type {BaseValues|null} */ (await readJsonState(BASE_STATE));
                     if (!base || base.date !== today) {
                         base = await fetchBase(auth, baseUrl, now, todayEnergy);
                         await writeJsonState(BASE_STATE, base);

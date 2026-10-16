@@ -22,6 +22,13 @@ export default [
         ],
     },
     {
+        // types in JSDoc are wanted in plain JavaScript files, they are the only type information there
+        files: ['**/*.js', '**/*.cjs', '**/*.mjs'],
+        rules: {
+            'jsdoc/check-tag-names': ['warn', { typed: false }],
+        },
+    },
+    {
         // you may disable some 'jsdoc' warnings - but using jsdoc is highly recommended
         // as this improves maintainability. jsdoc warnings will not block buiuld process.
         rules: {
