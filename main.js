@@ -13,11 +13,21 @@ const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
 const { SolarEdgeAuth, AuthError, describeError, extractSiteId } = require('./lib/auth');
 const { formatDate, convertToWh, parsePowerFlow } = require('./lib/helpers');
-const { dayKey, startOfDay, quarterWindowStart, mergeQuarters, sumQuarters, currentPower, monthAndYear, isDaylight } = require('./lib/energy');
+const {
+    dayKey,
+    startOfDay,
+    quarterWindowStart,
+    mergeQuarters,
+    sumQuarters,
+    currentPower,
+    monthAndYear,
+    isDaylight,
+} = require('./lib/energy');
 const adapterName = require('./package.json').name.split('.').pop();
 
 /**
  * The adapter instance
+ *
  * @type {ioBroker.Adapter}
  */
 let adapter;
@@ -30,27 +40,35 @@ const BASE_STATE = 'info.energyBase';
 
 /**
  * Starts the adapter instance
+ *
  * @param {Partial<ioBroker.AdapterOptions>} [options]
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
-    return adapter = utils.adapter(Object.assign({}, options, {
-        name: adapterName,
-        ready: main, // Main method defined below for readability
-    }));
+    return (adapter = utils.adapter(
+        Object.assign({}, options, {
+            name: adapterName,
+            ready: main, // Main method defined below for readability
+        }),
+    ));
 }
 
 /**
  * Builds a query string; dates are formatted as local time with offset.
+ *
  * @param {Record<string, string|Date>} params
  */
 function query(params) {
-    const entries = Object.entries(params).map(([key, value]) => [key, value instanceof Date ? formatDate(value) : value]);
+    const entries = Object.entries(params).map(([key, value]) => [
+        key,
+        value instanceof Date ? formatDate(value) : value,
+    ]);
     return new URLSearchParams(entries).toString();
 }
 
 /**
  * GET request against the v2 API. Retries once with a fresh access token on 401.
+ *
  * @param {SolarEdgeAuth} auth
  * @param {string} url
  */
@@ -63,7 +81,7 @@ async function apiGet(auth, url) {
     try {
         return await request();
     } catch (error) {
-        if (error.response && error.response.status === 401 && await auth.invalidateAccessToken()) {
+        if (error.response && error.response.status === 401 && (await auth.invalidateAccessToken())) {
             adapter.log.debug('Access token rejected, refreshing');
             return await request();
         }
@@ -73,6 +91,7 @@ async function apiGet(auth, url) {
 
 /**
  * Creates the state `<siteid>.<name>` if it does not exist yet.
+ *
  * @param {string} name
  * @param {ioBroker.StateCommon} common
  */
@@ -121,6 +140,7 @@ async function getLocation() {
 
 /**
  * Fetches month, year and lifetime energy until midnight.
+ *
  * @param {SolarEdgeAuth} auth
  * @param {string} baseUrl
  * @param {Date} now
@@ -131,9 +151,13 @@ async function fetchBase(auth, baseUrl, now, todayEnergy) {
     const midnight = startOfDay(now);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     // on January 1st there is nothing to fetch yet
-    const monthResp = midnight > startOfYear
-        ? await apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'MONTH', unit: 'WH', from: startOfYear, to: midnight })}`)
-        : null;
+    const monthResp =
+        midnight > startOfYear
+            ? await apiGet(
+                  auth,
+                  `${baseUrl}/energy?${query({ resolution: 'MONTH', unit: 'WH', from: startOfYear, to: midnight })}`,
+              )
+            : null;
     const { month, year } = monthAndYear(monthResp && monthResp.data, now);
 
     let lifetime = null;
@@ -162,7 +186,9 @@ async function main() {
         } else if (!clientId || !clientSecret) {
             adapter.log.error('client id or client secret not set');
         } else {
-            adapter.log.error('siteid not set: paste the complete redirect URL (including site_id) or enter the site id manually');
+            adapter.log.error(
+                'siteid not set: paste the complete redirect URL (including site_id) or enter the site id manually',
+            );
         }
         adapter.stop();
     } else {
@@ -180,14 +206,18 @@ async function main() {
         // create state objects only on first run; they persist across scheduled restarts
         if (!(await adapter.getObjectAsync(`${siteid}.currentPower`))) {
             adapter.log.debug('creating states');
-            await adapter.setObjectNotExistsAsync(siteid, { type: 'channel', common: { name: `Site ${siteid}` }, native: {} });
+            await adapter.setObjectNotExistsAsync(siteid, {
+                type: 'channel',
+                common: { name: `Site ${siteid}` },
+                native: {},
+            });
             await createState('lastUpdateTime', {
                 name: 'lastUpdateTime',
                 type: 'string',
                 role: 'date',
                 read: true,
                 write: false,
-                desc: 'Last update from inverter'
+                desc: 'Last update from inverter',
             });
             await createState('currentPower', {
                 name: 'currentPower',
@@ -207,7 +237,7 @@ async function main() {
                 write: false,
                 role: 'value.energy.produced',
                 unit: 'Wh',
-                desc: 'Lifetime energy in Wh'
+                desc: 'Lifetime energy in Wh',
             });
             await createState('lastYearData', {
                 name: 'lastYearData',
@@ -216,7 +246,7 @@ async function main() {
                 write: false,
                 unit: 'Wh',
                 role: 'value.energy.produced',
-                desc: 'last year energy in Wh'
+                desc: 'last year energy in Wh',
             });
         }
         if (adapter.config.retrieveLastMonthData && !(await adapter.getObjectAsync(`${siteid}.lastMonthData`))) {
@@ -227,7 +257,7 @@ async function main() {
                 write: false,
                 role: 'value.energy.produced',
                 unit: 'Wh',
-                desc: 'last month energy in Wh'
+                desc: 'last month energy in Wh',
             });
         }
         if (adapter.config.retrieveLastDayData && !(await adapter.getObjectAsync(`${siteid}.lastDayData`))) {
@@ -238,7 +268,7 @@ async function main() {
                 write: false,
                 unit: 'Wh',
                 role: 'value.energy.produced',
-                desc: 'last day energy in Wh'
+                desc: 'last day energy in Wh',
             });
         }
         if (adapter.config.currentPowerFlow && !(await adapter.getObjectAsync(`${siteid}.currentFlowStorageLevel`))) {
@@ -246,7 +276,11 @@ async function main() {
                 currentFlowGrid: ['Current flow: Grid', 'value.power', 'Current import from or export to the grid'],
                 currentFlowLoad: ['Current flow: Load', 'value.power.consumed', 'Current total usage'],
                 currentFlowPv: ['Current flow: PV', 'value.power.produced', 'Current production from PV'],
-                currentFlowStorage: ['Current flow: Storage', 'value.power', 'Current charge or discharge power of the battery'],
+                currentFlowStorage: [
+                    'Current flow: Storage',
+                    'value.power',
+                    'Current charge or discharge power of the battery',
+                ],
             };
             for (const [id, [name, role, desc]] of Object.entries(flowStates)) {
                 await createState(id, { name, type: 'number', read: true, write: false, unit: 'kW', role, desc });
@@ -297,7 +331,10 @@ async function main() {
         } else {
             try {
                 // one call per run: today's quarter hour energy, gives today's energy and the current power
-                const energyResp = await apiGet(auth, `${baseUrl}/energy?${query({ resolution: 'QUARTER_HOUR', unit: 'WH', from: quarterWindowStart(now), to: now })}`);
+                const energyResp = await apiGet(
+                    auth,
+                    `${baseUrl}/energy?${query({ resolution: 'QUARTER_HOUR', unit: 'WH', from: quarterWindowStart(now), to: now })}`,
+                );
                 const cache = mergeQuarters(await readJsonState(CACHE_STATE), energyResp.data, now);
                 await writeJsonState(CACHE_STATE, cache);
                 const todayEnergy = sumQuarters(cache);
@@ -307,7 +344,11 @@ async function main() {
                 adapter.log.debug('updating states');
 
                 if (power.timestamp !== null) {
-                    await adapter.setStateChangedAsync(`${siteid}.lastUpdateTime`, formatDate(new Date(power.timestamp)), true);
+                    await adapter.setStateChangedAsync(
+                        `${siteid}.lastUpdateTime`,
+                        formatDate(new Date(power.timestamp)),
+                        true,
+                    );
                 }
                 await adapter.setStateChangedAsync(`${siteid}.currentPower`, power.power, true);
                 if (adapter.config.retrieveLastDayData) {
@@ -327,7 +368,11 @@ async function main() {
                     if (adapter.config.retrieveLastYearData) {
                         await adapter.setStateChangedAsync(`${siteid}.lastYearData`, base.year + todayEnergy, true);
                         if (typeof base.lifetime === 'number') {
-                            await adapter.setStateChangedAsync(`${siteid}.lifeTimeData`, base.lifetime + todayEnergy, true);
+                            await adapter.setStateChangedAsync(
+                                `${siteid}.lifeTimeData`,
+                                base.lifetime + todayEnergy,
+                                true,
+                            );
                         }
                     }
                 }
@@ -356,7 +401,9 @@ async function main() {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 403) {
-                    adapter.log.warn('Power flow data requires Business Pro or Enterprise tier. See https://developer.solaredge.com/');
+                    adapter.log.warn(
+                        'Power flow data requires Business Pro or Enterprise tier. See https://developer.solaredge.com/',
+                    );
                 } else {
                     adapter.log.error(`Cannot read power flow from solaredge cloud: ${describeError(error)}`);
                 }
@@ -374,7 +421,9 @@ async function main() {
             if (instObj && !instObj.native.scheduleMigrated) {
                 if (/^(\d+ )?\*\/15 \* \* \* \*$/.test(instObj.common.schedule || '')) {
                     instObj.common.schedule = '*/30 * * * *';
-                    adapter.log.info('Schedule changed from every 15 to every 30 minutes to stay within the free API credits');
+                    adapter.log.info(
+                        'Schedule changed from every 15 to every 30 minutes to stay within the free API credits',
+                    );
                 }
                 instObj.native.scheduleMigrated = true;
                 changed = true;
@@ -400,8 +449,7 @@ async function main() {
     }
 }
 
-// @ts-ignore parent is a valid property on module
-if (module.parent) {
+if (require.main !== module) {
     // Export startAdapter in compact mode
     module.exports = startAdapter;
 } else {
