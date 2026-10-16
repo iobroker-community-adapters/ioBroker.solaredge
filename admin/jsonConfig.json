@@ -56,9 +56,10 @@
       "lg": 12,
       "xl": 12
     },
-    "_oauthDesc": {
+    "_oauthStep1": {
+      "newLine": true,
       "type": "staticText",
-      "text": "oauthInstructions",
+      "text": "oauthStep1",
       "hidden": "data.authType === 'apikey'",
       "xs": 12,
       "sm": 12,
@@ -100,6 +101,17 @@
       "lg": 4,
       "xl": 4
     },
+    "_oauthStep2": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "oauthStep2",
+      "hidden": "data.authType === 'apikey'",
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
     "clientId": {
       "newLine": true,
       "type": "text",
@@ -129,6 +141,17 @@
       "lg": 4,
       "xl": 4
     },
+    "_oauthStep3": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "oauthStep3",
+      "hidden": "data.authType === 'apikey'",
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
     "_authorizeUrl": {
       "newLine": true,
       "type": "pattern",
@@ -143,11 +166,33 @@
       "lg": 12,
       "xl": 12
     },
+    "_oauthStep4": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "oauthStep4",
+      "hidden": "data.authType === 'apikey'",
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
     "authCode": {
       "newLine": true,
       "type": "text",
       "label": "Authorization code or redirect URL",
       "help": "Paste the complete URL from the browser address bar after granting access, then save",
+      "hidden": "data.authType === 'apikey'",
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
+    },
+    "_oauthRenew": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "oauthRenew",
       "hidden": "data.authType === 'apikey'",
       "xs": 12,
       "sm": 12,
