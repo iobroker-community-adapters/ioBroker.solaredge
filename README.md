@@ -81,8 +81,7 @@ This adapter would not have been possible without the great work of @92lleo (htt
 	### **WORK IN PROGRESS**
 -->
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 2.0.0 (2026-10-16)
 - (mcm1957) BREAKING: Adapter has been migrated to SolarEdge Monitoring API v2. A new API key must be generated at https://developer.solaredge.com/ — v1 keys are not valid in v2.
 - (mcm1957) BREAKING: The `currentPowerFlow` feature now requires a Business Pro or Enterprise tier subscription at SolarEdge.
 - (Garfonso) OAuth2 Site Access (client id/secret of your own SolarEdge app) has been added, Fleet Access API key is optional. See README for setup.
@@ -113,33 +112,6 @@ This adapter would not have been possible without the great work of @92lleo (htt
 * (mcm1957) A response timeout has been added to network calls.
 * (mcm1957) Adapter has been moved to iobroker-community-adapters organization
 * (mcm1957) Dependencies have been updated
-
-### 1.1.0 (2023-11-16)
-* (bluefox) Added the current power flow data
-
-### 1.0.1 (2023-08-18)
-* (bluefox) Added JSON config and replaced `require` module with `axios`
-
-### 0.3.0
-* (Apollon77) Address review feedback from adapter review (see #19)
-
-### 0.2.0
-* (92lleo) Add default values for native config vars
-* (92lleo) Set schedule to 15s to match api update rate
-* (92lleo) Fix updating already created states (broken since new js-controller, see #9)
-* (92lleo) Update dependencies
-* (92lleo) Clear timer on unload
-* (92lleo) Add a connection type and dataSource
-
-### 0.1.1
-* (92lleo) fix "object data is invalid" issue, now works with new js-controller
-* (92lleo) update dependencies
-
-### 0.1.0
-* (92lleo) first beta release. overview data from inteverters are available
-
-### 0.0.1
-* (92lleo) initial release
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

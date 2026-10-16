@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "solaredge",
-    "version": "1.4.1",
+    "version": "2.0.0",
     "news": {
       "2.0.0": {
         "en": "Switched to the SolarEdge Monitoring API v2 (v1 will be shut down on 2026-11-01). The adapter must be set up again after the update, see the README.\nLogin with your own SolarEdge app (OAuth2, client id and secret); the site id is taken from the redirect URL. An API key (Fleet Access) is still possible for installers.\nFewer API calls to stay within the free credits: default schedule every 30 minutes, no calls at night.\nPower flow adapted to v2, with new states for battery and grid status.\nRequires Node.js >= 22, js-controller >= 6.0.11 and admin >= 7.7.22",
