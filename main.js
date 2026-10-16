@@ -10,7 +10,7 @@
  */
 
 const utils = require('@iobroker/adapter-core');
-const axios = require('axios');
+const axios = require('axios').default;
 const { SolarEdgeAuth, AuthError, describeError, extractSiteId } = require('./lib/auth');
 const { formatDate, convertToWh, parsePowerFlow } = require('./lib/helpers');
 const {
@@ -23,7 +23,7 @@ const {
     monthAndYear,
     isDaylight,
 } = require('./lib/energy');
-const adapterName = require('./package.json').name.split('.').pop();
+const adapterName = require('./package.json').name.split('.')[1];
 
 /**
  * The adapter instance
@@ -41,16 +41,15 @@ const BASE_STATE = 'info.energyBase';
 /**
  * Starts the adapter instance
  *
- * @param {Partial<ioBroker.AdapterOptions>} [options]
+ * @param {Partial<utils.AdapterOptions>} [options]
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
-    return (adapter = utils.adapter(
-        Object.assign({}, options, {
-            name: adapterName,
-            ready: main, // Main method defined below for readability
-        }),
-    ));
+    return (adapter = utils.adapter({
+        ...options,
+        name: adapterName,
+        ready: main, // Main method defined below for readability
+    }));
 }
 
 /**
@@ -59,11 +58,11 @@ function startAdapter(options) {
  * @param {Record<string, string|Date>} params
  */
 function query(params) {
-    const entries = Object.entries(params).map(([key, value]) => [
-        key,
-        value instanceof Date ? formatDate(value) : value,
-    ]);
-    return new URLSearchParams(entries).toString();
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+        search.append(key, value instanceof Date ? formatDate(value) : value);
+    }
+    return search.toString();
 }
 
 /**
@@ -126,8 +125,8 @@ async function writeJsonState(id, value) {
 async function getLocation() {
     try {
         const config = await adapter.getForeignObjectAsync('system.config');
-        const latitude = parseFloat(config && config.common && config.common.latitude);
-        const longitude = parseFloat(config && config.common && config.common.longitude);
+        const latitude = parseFloat(String(config?.common?.latitude));
+        const longitude = parseFloat(String(config?.common?.longitude));
         if (!isNaN(latitude) && !isNaN(longitude)) {
             return [latitude, longitude];
         }
@@ -190,7 +189,7 @@ async function main() {
                 'siteid not set: paste the complete redirect URL (including site_id) or enter the site id manually',
             );
         }
-        adapter.stop();
+        adapter.stop?.();
     } else {
         const baseUrl = `https://monitoringapi.solaredge.com/v2/sites/${siteid}`;
         const auth = new SolarEdgeAuth({
@@ -438,14 +437,14 @@ async function main() {
                 adapter.log.info(`Site id ${siteid} taken from the redirect URL`);
                 changed = true;
             }
-            if (changed) {
+            if (instObj && changed) {
                 await adapter.setForeignObjectAsync(`system.adapter.${adapter.namespace}`, instObj);
             }
         } catch (err) {
             adapter.log.error(`Could not check or adjust the instance settings: ${err.message}`);
         }
 
-        adapter.stop();
+        adapter.stop?.();
     }
 }
 
